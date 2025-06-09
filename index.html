@@ -7,7 +7,15 @@ const PortfolioDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddSubject, setShowAddSubject] = useState(false);
   const [newSubjectName, setNewSubjectName] = useState('');
-  const [timelineData, setTimelineData] = useState([]);
+  const [showAddGoal, setShowAddGoal] = useState(false);
+  const [currentSubjectForGoal, setCurrentSubjectForGoal] = useState(null);
+  const [newGoal, setNewGoal] = useState({
+    title: '',
+    type: 'basic',
+    weight: 1,
+    status: 'not_achieved',
+    achievedDate: ''
+  });
 
   // Initialize with sample data
   useEffect(() => {
@@ -16,142 +24,53 @@ const PortfolioDashboard = () => {
         id: 1,
         name: 'Mathematik',
         learningGoals: [
-          { id: 1, title: 'Bruchrechnung verstehen', type: 'basic', status: 'achieved', weight: 3 },
-          { id: 2, title: 'Gleichungen lösen', type: 'basic', status: 'partial', weight: 2 },
-          { id: 3, title: 'Geometrische Körper', type: 'basic', status: 'not_achieved', weight: 2 },
-          { id: 4, title: 'Komplexe Textaufgaben', type: 'advanced', status: 'achieved', weight: 1 },
-          { id: 5, title: 'Wahrscheinlichkeitsrechnung', type: 'advanced', status: 'partial', weight: 2 }
+          { id: 1, title: 'Bruchrechnung verstehen', type: 'basic', status: 'achieved', weight: 3, achievedDate: '2024-10-15' },
+          { id: 2, title: 'Gleichungen lösen', type: 'basic', status: 'partial', weight: 2, achievedDate: '2024-11-20' },
+          { id: 3, title: 'Geometrische Körper', type: 'basic', status: 'not_achieved', weight: 2, achievedDate: '' },
+          { id: 4, title: 'Komplexe Textaufgaben', type: 'advanced', status: 'achieved', weight: 1, achievedDate: '2024-12-05' },
+          { id: 5, title: 'Wahrscheinlichkeitsrechnung', type: 'advanced', status: 'partial', weight: 2, achievedDate: '2025-01-15' }
+        ],
+        timelineData: [
+          { month: 'August', basicAchieved: 15, basicPartial: 45, basicNotAchieved: 40, advancedAchieved: 5, advancedPartial: 15, advancedNotAchieved: 80 },
+          { month: 'September', basicAchieved: 25, basicPartial: 40, basicNotAchieved: 35, advancedAchieved: 10, advancedPartial: 20, advancedNotAchieved: 70 },
+          { month: 'Oktober', basicAchieved: 40, basicPartial: 35, basicNotAchieved: 25, advancedAchieved: 15, advancedPartial: 25, advancedNotAchieved: 60 },
+          { month: 'November', basicAchieved: 50, basicPartial: 30, basicNotAchieved: 20, advancedAchieved: 20, advancedPartial: 30, advancedNotAchieved: 50 },
+          { month: 'Dezember', basicAchieved: 60, basicPartial: 25, basicNotAchieved: 15, advancedAchieved: 25, advancedPartial: 35, advancedNotAchieved: 40 },
+          { month: 'Januar', basicAchieved: 70, basicPartial: 20, basicNotAchieved: 10, advancedAchieved: 30, advancedPartial: 40, advancedNotAchieved: 30 },
+          { month: 'Februar', basicAchieved: 75, basicPartial: 20, basicNotAchieved: 5, advancedAchieved: 35, advancedPartial: 35, advancedNotAchieved: 30 },
+          { month: 'März', basicAchieved: 80, basicPartial: 15, basicNotAchieved: 5, advancedAchieved: 40, advancedPartial: 35, advancedNotAchieved: 25 },
+          { month: 'April', basicAchieved: 85, basicPartial: 10, basicNotAchieved: 5, advancedAchieved: 45, advancedPartial: 30, advancedNotAchieved: 25 },
+          { month: 'Mai', basicAchieved: 90, basicPartial: 8, basicNotAchieved: 2, advancedAchieved: 50, advancedPartial: 30, advancedNotAchieved: 20 },
+          { month: 'Juni', basicAchieved: 95, basicPartial: 5, basicNotAchieved: 0, advancedAchieved: 55, advancedPartial: 25, advancedNotAchieved: 20 }
         ]
       },
       {
         id: 2,
         name: 'Deutsch',
         learningGoals: [
-          { id: 6, title: 'Rechtschreibung', type: 'basic', status: 'achieved', weight: 4 },
-          { id: 7, title: 'Textverständnis', type: 'basic', status: 'achieved', weight: 3 },
-          { id: 8, title: 'Aufsatz schreiben', type: 'basic', status: 'partial', weight: 2 },
-          { id: 9, title: 'Gedichtanalyse', type: 'advanced', status: 'partial', weight: 1 },
-          { id: 10, title: 'Rhetorik', type: 'advanced', status: 'not_achieved', weight: 1 }
+          { id: 6, title: 'Rechtschreibung', type: 'basic', status: 'achieved', weight: 4, achievedDate: '2024-09-10' },
+          { id: 7, title: 'Textverständnis', type: 'basic', status: 'achieved', weight: 3, achievedDate: '2024-11-05' },
+          { id: 8, title: 'Aufsatz schreiben', type: 'basic', status: 'partial', weight: 2, achievedDate: '2025-02-20' },
+          { id: 9, title: 'Gedichtanalyse', type: 'advanced', status: 'partial', weight: 1, achievedDate: '2025-03-10' },
+          { id: 10, title: 'Rhetorik', type: 'advanced', status: 'not_achieved', weight: 1, achievedDate: '' }
+        ],
+        timelineData: [
+          { month: 'August', basicAchieved: 25, basicPartial: 35, basicNotAchieved: 40, advancedAchieved: 15, advancedPartial: 25, advancedNotAchieved: 60 },
+          { month: 'September', basicAchieved: 35, basicPartial: 30, basicNotAchieved: 35, advancedAchieved: 20, advancedPartial: 30, advancedNotAchieved: 50 },
+          { month: 'Oktober', basicAchieved: 50, basicPartial: 25, basicNotAchieved: 25, advancedAchieved: 25, advancedPartial: 35, advancedNotAchieved: 40 },
+          { month: 'November', basicAchieved: 60, basicPartial: 20, basicNotAchieved: 20, advancedAchieved: 30, advancedPartial: 40, advancedNotAchieved: 30 },
+          { month: 'Dezember', basicAchieved: 70, basicPartial: 20, basicNotAchieved: 10, advancedAchieved: 35, advancedPartial: 45, advancedNotAchieved: 20 },
+          { month: 'Januar', basicAchieved: 75, basicPartial: 15, basicNotAchieved: 10, advancedAchieved: 40, advancedPartial: 40, advancedNotAchieved: 20 },
+          { month: 'Februar', basicAchieved: 80, basicPartial: 15, basicNotAchieved: 5, advancedAchieved: 45, advancedPartial: 35, advancedNotAchieved: 20 },
+          { month: 'März', basicAchieved: 85, basicPartial: 10, basicNotAchieved: 5, advancedAchieved: 50, advancedPartial: 30, advancedNotAchieved: 20 },
+          { month: 'April', basicAchieved: 88, basicPartial: 10, basicNotAchieved: 2, advancedAchieved: 55, advancedPartial: 25, advancedNotAchieved: 20 },
+          { month: 'Mai', basicAchieved: 92, basicPartial: 6, basicNotAchieved: 2, advancedAchieved: 60, advancedPartial: 25, advancedNotAchieved: 15 },
+          { month: 'Juni', basicAchieved: 95, basicPartial: 5, basicNotAchieved: 0, advancedAchieved: 65, advancedPartial: 20, advancedNotAchieved: 15 }
         ]
       }
     ];
     
-    // Generate sample timeline data for the school year
-    const sampleTimelineData = [
-      {
-        date: 'Aug 2024',
-        month: 'August',
-        basicAchieved: 20,
-        basicPartial: 40,
-        basicNotAchieved: 40,
-        advancedAchieved: 10,
-        advancedPartial: 20,
-        advancedNotAchieved: 70
-      },
-      {
-        date: 'Sep 2024',
-        month: 'September',
-        basicAchieved: 30,
-        basicPartial: 35,
-        basicNotAchieved: 35,
-        advancedAchieved: 15,
-        advancedPartial: 25,
-        advancedNotAchieved: 60
-      },
-      {
-        date: 'Oct 2024',
-        month: 'Oktober',
-        basicAchieved: 45,
-        basicPartial: 30,
-        basicNotAchieved: 25,
-        advancedAchieved: 20,
-        advancedPartial: 30,
-        advancedNotAchieved: 50
-      },
-      {
-        date: 'Nov 2024',
-        month: 'November',
-        basicAchieved: 55,
-        basicPartial: 25,
-        basicNotAchieved: 20,
-        advancedAchieved: 25,
-        advancedPartial: 35,
-        advancedNotAchieved: 40
-      },
-      {
-        date: 'Dec 2024',
-        month: 'Dezember',
-        basicAchieved: 60,
-        basicPartial: 25,
-        basicNotAchieved: 15,
-        advancedAchieved: 30,
-        advancedPartial: 40,
-        advancedNotAchieved: 30
-      },
-      {
-        date: 'Jan 2025',
-        month: 'Januar',
-        basicAchieved: 65,
-        basicPartial: 20,
-        basicNotAchieved: 15,
-        advancedAchieved: 35,
-        advancedPartial: 35,
-        advancedNotAchieved: 30
-      },
-      {
-        date: 'Feb 2025',
-        month: 'Februar',
-        basicAchieved: 70,
-        basicPartial: 20,
-        basicNotAchieved: 10,
-        advancedAchieved: 40,
-        advancedPartial: 35,
-        advancedNotAchieved: 25
-      },
-      {
-        date: 'Mar 2025',
-        month: 'März',
-        basicAchieved: 75,
-        basicPartial: 15,
-        basicNotAchieved: 10,
-        advancedAchieved: 45,
-        advancedPartial: 30,
-        advancedNotAchieved: 25
-      },
-      {
-        date: 'Apr 2025',
-        month: 'April',
-        basicAchieved: 80,
-        basicPartial: 15,
-        basicNotAchieved: 5,
-        advancedAchieved: 50,
-        advancedPartial: 30,
-        advancedNotAchieved: 20
-      },
-      {
-        date: 'May 2025',
-        month: 'Mai',
-        basicAchieved: 85,
-        basicPartial: 10,
-        basicNotAchieved: 5,
-        advancedAchieved: 55,
-        advancedPartial: 25,
-        advancedNotAchieved: 20
-      },
-      {
-        date: 'Jun 2025',
-        month: 'Juni',
-        basicAchieved: 90,
-        basicPartial: 8,
-        basicNotAchieved: 2,
-        advancedAchieved: 60,
-        advancedPartial: 25,
-        advancedNotAchieved: 15
-      }
-    ];
-    
     setSubjects(sampleSubjects);
-    setTimelineData(sampleTimelineData);
   }, []);
 
   const addSubject = () => {
@@ -159,7 +78,20 @@ const PortfolioDashboard = () => {
       const newSubject = {
         id: Date.now(),
         name: newSubjectName.trim(),
-        learningGoals: []
+        learningGoals: [],
+        timelineData: [
+          { month: 'August', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'September', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'Oktober', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'November', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'Dezember', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'Januar', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'Februar', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'März', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'April', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'Mai', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
+          { month: 'Juni', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 }
+        ]
       };
       setSubjects([...subjects, newSubject]);
       setNewSubjectName('');
@@ -175,34 +107,69 @@ const PortfolioDashboard = () => {
   };
 
   const addLearningGoal = (subjectId) => {
-    const title = prompt('Titel des Lernziels:');
-    const type = confirm('Ist dies eine Erweiterte Anforderung? (OK = Ja, Abbrechen = Grundanforderung)') ? 'advanced' : 'basic';
-    const weight = parseInt(prompt('Gewichtung (1-5):') || '1');
-    
-    if (title) {
-      const newGoal = {
+    setCurrentSubjectForGoal(subjectId);
+    setShowAddGoal(true);
+    setNewGoal({
+      title: '',
+      type: 'basic',
+      weight: 1,
+      status: 'not_achieved',
+      achievedDate: ''
+    });
+  };
+
+  const saveNewGoal = () => {
+    if (newGoal.title.trim() && currentSubjectForGoal) {
+      const goalToAdd = {
         id: Date.now(),
-        title: title.trim(),
-        type,
-        status: 'not_achieved',
-        weight: Math.max(1, Math.min(5, weight))
+        title: newGoal.title.trim(),
+        type: newGoal.type,
+        status: newGoal.status,
+        weight: parseInt(newGoal.weight),
+        achievedDate: newGoal.achievedDate
       };
       
       setSubjects(subjects.map(s => 
-        s.id === subjectId 
-          ? { ...s, learningGoals: [...s.learningGoals, newGoal] }
+        s.id === currentSubjectForGoal 
+          ? { ...s, learningGoals: [...s.learningGoals, goalToAdd] }
           : s
       ));
+      
+      setShowAddGoal(false);
+      setCurrentSubjectForGoal(null);
+      setNewGoal({
+        title: '',
+        type: 'basic',
+        weight: 1,
+        status: 'not_achieved',
+        achievedDate: ''
+      });
     }
   };
 
-  const updateGoalStatus = (subjectId, goalId, newStatus) => {
+  const cancelAddGoal = () => {
+    setShowAddGoal(false);
+    setCurrentSubjectForGoal(null);
+    setNewGoal({
+      title: '',
+      type: 'basic',
+      weight: 1,
+      status: 'not_achieved',
+      achievedDate: ''
+    });
+  };
+
+  const updateGoalStatus = (subjectId, goalId, newStatus, newDate = '') => {
     setSubjects(subjects.map(s => 
       s.id === subjectId 
         ? {
             ...s, 
             learningGoals: s.learningGoals.map(g => 
-              g.id === goalId ? { ...g, status: newStatus } : g
+              g.id === goalId ? { 
+                ...g, 
+                status: newStatus,
+                achievedDate: newStatus === 'achieved' ? (newDate || new Date().toISOString().split('T')[0]) : (newStatus === 'not_achieved' ? '' : g.achievedDate)
+              } : g
             )
           }
         : s
@@ -250,18 +217,27 @@ const PortfolioDashboard = () => {
     return Object.values(data);
   };
 
-  const TimelineVisualization = () => {
+  const SubjectTimelineVisualization = ({ subject }) => {
+    if (!subject.timelineData || subject.timelineData.length === 0) {
+      return (
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-lg font-semibold mb-4">Entwicklung im Schuljahr</h3>
+          <p className="text-gray-500 text-center py-8">Noch keine Timeline-Daten verfügbar</p>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-6">
         {/* Grundanforderungen Timeline */}
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Clock className="w-5 h-5" />
-            Entwicklung Grundanforderungen im Schuljahr
+            Entwicklung Grundanforderungen - {subject.name}
           </h3>
           <div style={{ width: '100%', height: '300px' }}>
             <ResponsiveContainer>
-              <AreaChart data={timelineData}>
+              <AreaChart data={subject.timelineData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="month" 
@@ -309,11 +285,11 @@ const PortfolioDashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Star className="w-5 h-5" />
-            Entwicklung Erweiterte Anforderungen im Schuljahr
+            Entwicklung Erweiterte Anforderungen - {subject.name}
           </h3>
           <div style={{ width: '100%', height: '300px' }}>
             <ResponsiveContainer>
-              <AreaChart data={timelineData}>
+              <AreaChart data={subject.timelineData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="month" 
@@ -361,11 +337,11 @@ const PortfolioDashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Fortschrittstrend: Erreichte Lernziele
+            Fortschrittstrend - {subject.name}
           </h3>
           <div style={{ width: '100%', height: '300px' }}>
             <ResponsiveContainer>
-              <LineChart data={timelineData}>
+              <LineChart data={subject.timelineData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="month" 
@@ -399,47 +375,6 @@ const PortfolioDashboard = () => {
                 />
               </LineChart>
             </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Zusammenfassung */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold mb-4">Entwicklung im Überblick</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-700">Grundanforderungen</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>August 2024:</span>
-                  <span className="text-green-600 font-medium">20% erreicht</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Juni 2025:</span>
-                  <span className="text-green-600 font-medium">90% erreicht</span>
-                </div>
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-medium">Fortschritt:</span>
-                  <span className="text-green-600 font-bold">+70%</span>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <h4 className="font-medium text-gray-700">Erweiterte Anforderungen</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>August 2024:</span>
-                  <span className="text-blue-600 font-medium">10% erreicht</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Juni 2025:</span>
-                  <span className="text-blue-600 font-medium">60% erreicht</span>
-                </div>
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-medium">Fortschritt:</span>
-                  <span className="text-blue-600 font-bold">+50%</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -511,6 +446,8 @@ const PortfolioDashboard = () => {
       <div className="space-y-6">
         <BubbleVisualization subject={subject} />
         
+        <SubjectTimelineVisualization subject={subject} />
+        
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -525,6 +462,98 @@ const PortfolioDashboard = () => {
               Lernziel hinzufügen
             </button>
           </div>
+
+          {/* Add Goal Form */}
+          {showAddGoal && currentSubjectForGoal === subject.id && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-semibold mb-3">Neues Lernziel hinzufügen</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Titel</label>
+                  <input
+                    type="text"
+                    value={newGoal.title}
+                    onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
+                    placeholder="Titel des Lernziels"
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Typ</label>
+                    <select
+                      value={newGoal.type}
+                      onChange={(e) => setNewGoal({...newGoal, type: e.target.value})}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="basic">Grundanforderung</option>
+                      <option value="advanced">Erweiterte Anforderung</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Gewichtung</label>
+                    <select
+                      value={newGoal.weight}
+                      onChange={(e) => setNewGoal({...newGoal, weight: e.target.value})}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Status</label>
+                    <select
+                      value={newGoal.status}
+                      onChange={(e) => setNewGoal({...newGoal, status: e.target.value})}
+                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="not_achieved">Noch nicht erreicht</option>
+                      <option value="partial">Teilweise erreicht</option>
+                      <option value="achieved">Erreicht</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-1">Erreicht am (optional)</label>
+                  <input
+                    type="date"
+                    value={newGoal.achievedDate}
+                    onChange={(e) => setNewGoal({...newGoal, achievedDate: e.target.value})}
+                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                  <div className="text-xs text-gray-500 mt-1">
+                    Datum wird nur angezeigt, wenn Status "Erreicht" oder "Teilweise erreicht" ist
+                  </div>
+                </div>
+                
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={saveNewGoal}
+                    disabled={!newGoal.title.trim()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Speichern
+                  </button>
+                  <button
+                    onClick={cancelAddGoal}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
+                  >
+                    Abbrechen
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="space-y-3">
             {subject.learningGoals.length === 0 ? (
@@ -542,19 +571,39 @@ const PortfolioDashboard = () => {
                   </div>
                   
                   <div className="flex-1">
-                    <span className="font-medium">{goal.title}</span>
+                    <div className="font-medium">{goal.title}</div>
+                    {goal.achievedDate && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        Erreicht am: {new Date(goal.achievedDate).toLocaleDateString('de-DE')}
+                      </div>
+                    )}
                   </div>
                   
-                  <select
-                    value={goal.status}
-                    onChange={(e) => updateGoalStatus(subject.id, goal.id, e.target.value)}
-                    className="px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    style={{ color: getStatusColor(goal.status) }}
-                  >
-                    <option value="not_achieved">Noch nicht erreicht</option>
-                    <option value="partial">Teilweise erreicht</option>
-                    <option value="achieved">Erreicht</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={goal.status}
+                      onChange={(e) => updateGoalStatus(subject.id, goal.id, e.target.value)}
+                      className="px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      style={{ color: getStatusColor(goal.status) }}
+                    >
+                      <option value="not_achieved">Noch nicht erreicht</option>
+                      <option value="partial">Teilweise erreicht</option>
+                      <option value="achieved">Erreicht</option>
+                    </select>
+                    
+                    {(goal.status === 'achieved' || goal.status === 'partial') && (
+                      <input
+                        type="date"
+                        value={goal.achievedDate || ''}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          updateGoalStatus(subject.id, goal.id, goal.status, e.target.value);
+                        }}
+                        className="px-2 py-1 border rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onKeyDown={(e) => e.stopPropagation()}
+                      />
+                    )}
+                  </div>
                   
                   <button
                     onClick={() => removeGoal(subject.id, goal.id)}
@@ -570,6 +619,8 @@ const PortfolioDashboard = () => {
       </div>
     );
   };
+
+  const currentSubject = subjects.find(s => activeTab === `subject-${s.id}`);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -604,7 +655,12 @@ const PortfolioDashboard = () => {
                   onChange={(e) => setNewSubjectName(e.target.value)}
                   placeholder="Fachname"
                   className="w-full px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onKeyPress={(e) => e.key === 'Enter' && addSubject()}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addSubject();
+                    }
+                  }}
                 />
                 <div className="flex gap-2 mt-2">
                   <button
@@ -631,15 +687,6 @@ const PortfolioDashboard = () => {
                 }`}
               >
                 Übersicht
-              </button>
-              
-              <button
-                onClick={() => setActiveTab('timeline')}
-                className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                  activeTab === 'timeline' ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'
-                }`}
-              >
-                Timeline
               </button>
               
               {subjects.map(subject => (
@@ -696,3 +743,18 @@ const PortfolioDashboard = () => {
                   </div>
                 </div>
               </div>
+            ) : currentSubject ? (
+              <SubjectManagement subject={currentSubject} />
+            ) : (
+              <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
+                <p className="text-gray-500">Fach nicht gefunden</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PortfolioDashboard;
