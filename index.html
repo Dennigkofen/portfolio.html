@@ -1,760 +1,1941 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, X, Star, Circle, Settings, BarChart3, BookOpen, Clock, TrendingUp } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area } from 'recharts';
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kompetenz-Portfolio</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for goal list */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9; /* slate-100 */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* slate-300 */
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* slate-400 */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
 
-const PortfolioDashboard = () => {
-  const [subjects, setSubjects] = useState([]);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [showAddSubject, setShowAddSubject] = useState(false);
-  const [newSubjectName, setNewSubjectName] = useState('');
-  const [showAddGoal, setShowAddGoal] = useState(false);
-  const [currentSubjectForGoal, setCurrentSubjectForGoal] = useState(null);
-  const [newGoal, setNewGoal] = useState({
-    title: '',
-    type: 'basic',
-    weight: 1,
-    status: 'not_achieved',
-    achievedDate: ''
-  });
-
-  // Initialize with sample data
-  useEffect(() => {
-    const sampleSubjects = [
-      {
-        id: 1,
-        name: 'Mathematik',
-        learningGoals: [
-          { id: 1, title: 'Bruchrechnung verstehen', type: 'basic', status: 'achieved', weight: 3, achievedDate: '2024-10-15' },
-          { id: 2, title: 'Gleichungen lösen', type: 'basic', status: 'partial', weight: 2, achievedDate: '2024-11-20' },
-          { id: 3, title: 'Geometrische Körper', type: 'basic', status: 'not_achieved', weight: 2, achievedDate: '' },
-          { id: 4, title: 'Komplexe Textaufgaben', type: 'advanced', status: 'achieved', weight: 1, achievedDate: '2024-12-05' },
-          { id: 5, title: 'Wahrscheinlichkeitsrechnung', type: 'advanced', status: 'partial', weight: 2, achievedDate: '2025-01-15' }
-        ],
-        timelineData: [
-          { month: 'August', basicAchieved: 15, basicPartial: 45, basicNotAchieved: 40, advancedAchieved: 5, advancedPartial: 15, advancedNotAchieved: 80 },
-          { month: 'September', basicAchieved: 25, basicPartial: 40, basicNotAchieved: 35, advancedAchieved: 10, advancedPartial: 20, advancedNotAchieved: 70 },
-          { month: 'Oktober', basicAchieved: 40, basicPartial: 35, basicNotAchieved: 25, advancedAchieved: 15, advancedPartial: 25, advancedNotAchieved: 60 },
-          { month: 'November', basicAchieved: 50, basicPartial: 30, basicNotAchieved: 20, advancedAchieved: 20, advancedPartial: 30, advancedNotAchieved: 50 },
-          { month: 'Dezember', basicAchieved: 60, basicPartial: 25, basicNotAchieved: 15, advancedAchieved: 25, advancedPartial: 35, advancedNotAchieved: 40 },
-          { month: 'Januar', basicAchieved: 70, basicPartial: 20, basicNotAchieved: 10, advancedAchieved: 30, advancedPartial: 40, advancedNotAchieved: 30 },
-          { month: 'Februar', basicAchieved: 75, basicPartial: 20, basicNotAchieved: 5, advancedAchieved: 35, advancedPartial: 35, advancedNotAchieved: 30 },
-          { month: 'März', basicAchieved: 80, basicPartial: 15, basicNotAchieved: 5, advancedAchieved: 40, advancedPartial: 35, advancedNotAchieved: 25 },
-          { month: 'April', basicAchieved: 85, basicPartial: 10, basicNotAchieved: 5, advancedAchieved: 45, advancedPartial: 30, advancedNotAchieved: 25 },
-          { month: 'Mai', basicAchieved: 90, basicPartial: 8, basicNotAchieved: 2, advancedAchieved: 50, advancedPartial: 30, advancedNotAchieved: 20 },
-          { month: 'Juni', basicAchieved: 95, basicPartial: 5, basicNotAchieved: 0, advancedAchieved: 55, advancedPartial: 25, advancedNotAchieved: 20 }
-        ]
-      },
-      {
-        id: 2,
-        name: 'Deutsch',
-        learningGoals: [
-          { id: 6, title: 'Rechtschreibung', type: 'basic', status: 'achieved', weight: 4, achievedDate: '2024-09-10' },
-          { id: 7, title: 'Textverständnis', type: 'basic', status: 'achieved', weight: 3, achievedDate: '2024-11-05' },
-          { id: 8, title: 'Aufsatz schreiben', type: 'basic', status: 'partial', weight: 2, achievedDate: '2025-02-20' },
-          { id: 9, title: 'Gedichtanalyse', type: 'advanced', status: 'partial', weight: 1, achievedDate: '2025-03-10' },
-          { id: 10, title: 'Rhetorik', type: 'advanced', status: 'not_achieved', weight: 1, achievedDate: '' }
-        ],
-        timelineData: [
-          { month: 'August', basicAchieved: 25, basicPartial: 35, basicNotAchieved: 40, advancedAchieved: 15, advancedPartial: 25, advancedNotAchieved: 60 },
-          { month: 'September', basicAchieved: 35, basicPartial: 30, basicNotAchieved: 35, advancedAchieved: 20, advancedPartial: 30, advancedNotAchieved: 50 },
-          { month: 'Oktober', basicAchieved: 50, basicPartial: 25, basicNotAchieved: 25, advancedAchieved: 25, advancedPartial: 35, advancedNotAchieved: 40 },
-          { month: 'November', basicAchieved: 60, basicPartial: 20, basicNotAchieved: 20, advancedAchieved: 30, advancedPartial: 40, advancedNotAchieved: 30 },
-          { month: 'Dezember', basicAchieved: 70, basicPartial: 20, basicNotAchieved: 10, advancedAchieved: 35, advancedPartial: 45, advancedNotAchieved: 20 },
-          { month: 'Januar', basicAchieved: 75, basicPartial: 15, basicNotAchieved: 10, advancedAchieved: 40, advancedPartial: 40, advancedNotAchieved: 20 },
-          { month: 'Februar', basicAchieved: 80, basicPartial: 15, basicNotAchieved: 5, advancedAchieved: 45, advancedPartial: 35, advancedNotAchieved: 20 },
-          { month: 'März', basicAchieved: 85, basicPartial: 10, basicNotAchieved: 5, advancedAchieved: 50, advancedPartial: 30, advancedNotAchieved: 20 },
-          { month: 'April', basicAchieved: 88, basicPartial: 10, basicNotAchieved: 2, advancedAchieved: 55, advancedPartial: 25, advancedNotAchieved: 20 },
-          { month: 'Mai', basicAchieved: 92, basicPartial: 6, basicNotAchieved: 2, advancedAchieved: 60, advancedPartial: 25, advancedNotAchieved: 15 },
-          { month: 'Juni', basicAchieved: 95, basicPartial: 5, basicNotAchieved: 0, advancedAchieved: 65, advancedPartial: 20, advancedNotAchieved: 15 }
-        ]
-      }
-    ];
-    
-    setSubjects(sampleSubjects);
-  }, []);
-
-  const addSubject = () => {
-    if (newSubjectName.trim()) {
-      const newSubject = {
-        id: Date.now(),
-        name: newSubjectName.trim(),
-        learningGoals: [],
-        timelineData: [
-          { month: 'August', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'September', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'Oktober', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'November', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'Dezember', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'Januar', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'Februar', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'März', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'April', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'Mai', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 },
-          { month: 'Juni', basicAchieved: 0, basicPartial: 0, basicNotAchieved: 0, advancedAchieved: 0, advancedPartial: 0, advancedNotAchieved: 0 }
-        ]
-      };
-      setSubjects([...subjects, newSubject]);
-      setNewSubjectName('');
-      setShowAddSubject(false);
-    }
-  };
-
-  const removeSubject = (subjectId) => {
-    setSubjects(subjects.filter(s => s.id !== subjectId));
-    if (activeTab === `subject-${subjectId}`) {
-      setActiveTab('overview');
-    }
-  };
-
-  const addLearningGoal = (subjectId) => {
-    setCurrentSubjectForGoal(subjectId);
-    setShowAddGoal(true);
-    setNewGoal({
-      title: '',
-      type: 'basic',
-      weight: 1,
-      status: 'not_achieved',
-      achievedDate: ''
-    });
-  };
-
-  const saveNewGoal = () => {
-    if (newGoal.title.trim() && currentSubjectForGoal) {
-      const goalToAdd = {
-        id: Date.now(),
-        title: newGoal.title.trim(),
-        type: newGoal.type,
-        status: newGoal.status,
-        weight: parseInt(newGoal.weight),
-        achievedDate: newGoal.achievedDate
-      };
-      
-      setSubjects(subjects.map(s => 
-        s.id === currentSubjectForGoal 
-          ? { ...s, learningGoals: [...s.learningGoals, goalToAdd] }
-          : s
-      ));
-      
-      setShowAddGoal(false);
-      setCurrentSubjectForGoal(null);
-      setNewGoal({
-        title: '',
-        type: 'basic',
-        weight: 1,
-        status: 'not_achieved',
-        achievedDate: ''
-      });
-    }
-  };
-
-  const cancelAddGoal = () => {
-    setShowAddGoal(false);
-    setCurrentSubjectForGoal(null);
-    setNewGoal({
-      title: '',
-      type: 'basic',
-      weight: 1,
-      status: 'not_achieved',
-      achievedDate: ''
-    });
-  };
-
-  const updateGoalStatus = (subjectId, goalId, newStatus, newDate = '') => {
-    setSubjects(subjects.map(s => 
-      s.id === subjectId 
-        ? {
-            ...s, 
-            learningGoals: s.learningGoals.map(g => 
-              g.id === goalId ? { 
-                ...g, 
-                status: newStatus,
-                achievedDate: newStatus === 'achieved' ? (newDate || new Date().toISOString().split('T')[0]) : (newStatus === 'not_achieved' ? '' : g.achievedDate)
-              } : g
-            )
-          }
-        : s
-    ));
-  };
-
-  const removeGoal = (subjectId, goalId) => {
-    setSubjects(subjects.map(s => 
-      s.id === subjectId 
-        ? { ...s, learningGoals: s.learningGoals.filter(g => g.id !== goalId) }
-        : s
-    ));
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'achieved': return '#22c55e';
-      case 'partial': return '#f59e0b';
-      case 'not_achieved': return '#ef4444';
-      default: return '#6b7280';
-    }
-  };
-
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'achieved': return 'Erreicht';
-      case 'partial': return 'Teilweise erreicht';
-      case 'not_achieved': return 'Noch nicht erreicht';
-      default: return 'Unbewertet';
-    }
-  };
-
-  const getBubbleData = (subject) => {
-    const data = {};
-    
-    subject.learningGoals.forEach(goal => {
-      const key = `${goal.type}-${goal.status}`;
-      if (!data[key]) {
-        data[key] = { type: goal.type, status: goal.status, count: 0, totalWeight: 0 };
-      }
-      data[key].count += 1;
-      data[key].totalWeight += goal.weight;
-    });
-    
-    return Object.values(data);
-  };
-
-  const SubjectTimelineVisualization = ({ subject }) => {
-    if (!subject.timelineData || subject.timelineData.length === 0) {
-      return (
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold mb-4">Entwicklung im Schuljahr</h3>
-          <p className="text-gray-500 text-center py-8">Noch keine Timeline-Daten verfügbar</p>
-        </div>
-      );
-    }
-
-    return (
-      <div className="space-y-6">
-        {/* Grundanforderungen Timeline */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Entwicklung Grundanforderungen - {subject.name}
-          </h3>
-          <div style={{ width: '100%', height: '300px' }}>
-            <ResponsiveContainer>
-              <AreaChart data={subject.timelineData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis 
-                  label={{ value: 'Prozent (%)', angle: -90, position: 'insideLeft' }}
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip 
-                  formatter={(value, name) => [`${value}%`, name]}
-                  labelFormatter={(label) => `Monat: ${label}`}
-                />
-                <Legend />
-                <Area 
-                  type="monotone" 
-                  dataKey="basicAchieved" 
-                  stackId="1" 
-                  stroke="#22c55e" 
-                  fill="#22c55e" 
-                  name="Erreicht"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="basicPartial" 
-                  stackId="1" 
-                  stroke="#f59e0b" 
-                  fill="#f59e0b" 
-                  name="Teilweise erreicht"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="basicNotAchieved" 
-                  stackId="1" 
-                  stroke="#ef4444" 
-                  fill="#ef4444" 
-                  name="Noch nicht erreicht"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Erweiterte Anforderungen Timeline */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Star className="w-5 h-5" />
-            Entwicklung Erweiterte Anforderungen - {subject.name}
-          </h3>
-          <div style={{ width: '100%', height: '300px' }}>
-            <ResponsiveContainer>
-              <AreaChart data={subject.timelineData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis 
-                  label={{ value: 'Prozent (%)', angle: -90, position: 'insideLeft' }}
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip 
-                  formatter={(value, name) => [`${value}%`, name]}
-                  labelFormatter={(label) => `Monat: ${label}`}
-                />
-                <Legend />
-                <Area 
-                  type="monotone" 
-                  dataKey="advancedAchieved" 
-                  stackId="1" 
-                  stroke="#22c55e" 
-                  fill="#22c55e" 
-                  name="Erreicht"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="advancedPartial" 
-                  stackId="1" 
-                  stroke="#f59e0b" 
-                  fill="#f59e0b" 
-                  name="Teilweise erreicht"
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="advancedNotAchieved" 
-                  stackId="1" 
-                  stroke="#ef4444" 
-                  fill="#ef4444" 
-                  name="Noch nicht erreicht"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Kombinierte Trendlinie */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Fortschrittstrend - {subject.name}
-          </h3>
-          <div style={{ width: '100%', height: '300px' }}>
-            <ResponsiveContainer>
-              <LineChart data={subject.timelineData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="month" 
-                  tick={{ fontSize: 12 }}
-                />
-                <YAxis 
-                  label={{ value: 'Prozent (%)', angle: -90, position: 'insideLeft' }}
-                  tick={{ fontSize: 12 }}
-                />
-                <Tooltip 
-                  formatter={(value, name) => [`${value}%`, name]}
-                  labelFormatter={(label) => `Monat: ${label}`}
-                />
-                <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="basicAchieved" 
-                  stroke="#22c55e" 
-                  strokeWidth={3}
-                  dot={{ fill: '#22c55e', strokeWidth: 2, r: 4 }}
-                  name="Grundanforderungen erreicht"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="advancedAchieved" 
-                  stroke="#3b82f6" 
-                  strokeWidth={3}
-                  strokeDasharray="5 5"
-                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                  name="Erweiterte Anforderungen erreicht"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const BubbleVisualization = ({ subject }) => {
-    const bubbleData = getBubbleData(subject);
-    const maxWeight = Math.max(...bubbleData.map(b => b.totalWeight), 1);
-    
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5" />
-          Kompetenzübersicht: {subject.name}
-        </h3>
-        <div className="flex flex-wrap gap-8 justify-center items-center min-h-[300px]">
-          {bubbleData.map((bubble, index) => {
-            const size = 40 + (bubble.totalWeight / maxWeight) * 120;
-            const color = getStatusColor(bubble.status);
-            
-            return (
-              <div 
-                key={index}
-                className="flex flex-col items-center gap-2 relative group"
-              >
-                <div 
-                  className="flex items-center justify-center text-white font-bold shadow-lg hover:scale-105 transition-transform cursor-pointer"
-                  style={{
-                    width: `${size}px`,
-                    height: `${size}px`,
-                    backgroundColor: color,
-                    borderRadius: bubble.type === 'basic' ? '50%' : '0%',
-                    clipPath: bubble.type === 'advanced' ? 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)' : 'none'
-                  }}
-                >
-                  {bubble.count}
+    <div class="flex h-screen">
+        <!-- --- Sidebar --- -->
+        <aside class="w-72 bg-white p-4 border-r border-slate-200 flex flex-col shrink-0">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-2 bg-indigo-100 rounded-lg">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2 0 0 1 0-5H20"></path></svg>
                 </div>
-                <div className="text-center text-sm">
-                  <div className="font-medium">
-                    {bubble.type === 'basic' ? 'Grundanforderungen' : 'Erweiterte Anforderungen'}
-                  </div>
-                  <div className="text-gray-600">
-                    {getStatusText(bubble.status)}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {bubble.count} Lernziel{bubble.count !== 1 ? 'e' : ''}
-                  </div>
-                </div>
-                
-                {/* Tooltip */}
-                <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-                  Gewichtung: {bubble.totalWeight}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-6 text-sm text-gray-600 bg-gray-50 p-3 rounded">
-          <strong>Legende:</strong> Kreise = Grundanforderungen, Sterne = Erweiterte Anforderungen. 
-          Größe = Anzahl Lernziele, Farbe = Erreichungsgrad.
-        </div>
-      </div>
-    );
-  };
-
-  const SubjectManagement = ({ subject }) => {
-    return (
-      <div className="space-y-6">
-        <BubbleVisualization subject={subject} />
-        
-        <SubjectTimelineVisualization subject={subject} />
-        
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Settings className="w-5 h-5" />
-              Lernziele verwalten
-            </h3>
-            <button
-              onClick={() => addLearningGoal(subject.id)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Lernziel hinzufügen
-            </button>
-          </div>
-
-          {/* Add Goal Form */}
-          {showAddGoal && currentSubjectForGoal === subject.id && (
-            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-semibold mb-3">Neues Lernziel hinzufügen</h4>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Titel</label>
-                  <input
-                    type="text"
-                    value={newGoal.title}
-                    onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
-                    placeholder="Titel des Lernziels"
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onKeyDown={(e) => e.stopPropagation()}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Typ</label>
-                    <select
-                      value={newGoal.type}
-                      onChange={(e) => setNewGoal({...newGoal, type: e.target.value})}
-                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="basic">Grundanforderung</option>
-                      <option value="advanced">Erweiterte Anforderung</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Gewichtung</label>
-                    <select
-                      value={newGoal.weight}
-                      onChange={(e) => setNewGoal({...newGoal, weight: e.target.value})}
-                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Status</label>
-                    <select
-                      value={newGoal.status}
-                      onChange={(e) => setNewGoal({...newGoal, status: e.target.value})}
-                      className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="not_achieved">Noch nicht erreicht</option>
-                      <option value="partial">Teilweise erreicht</option>
-                      <option value="achieved">Erreicht</option>
-                    </select>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Erreicht am (optional)</label>
-                  <input
-                    type="date"
-                    value={newGoal.achievedDate}
-                    onChange={(e) => setNewGoal({...newGoal, achievedDate: e.target.value})}
-                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onKeyDown={(e) => e.stopPropagation()}
-                  />
-                  <div className="text-xs text-gray-500 mt-1">
-                    Datum wird nur angezeigt, wenn Status "Erreicht" oder "Teilweise erreicht" ist
-                  </div>
-                </div>
-                
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={saveNewGoal}
-                    disabled={!newGoal.title.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    Speichern
-                  </button>
-                  <button
-                    onClick={cancelAddGoal}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
-                  >
-                    Abbrechen
-                  </button>
-                </div>
-              </div>
+                <h1 class="text-xl font-bold text-slate-900">Kompetenz-Portfolio</h1>
             </div>
-          )}
-          
-          <div className="space-y-3">
-            {subject.learningGoals.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
-                Noch keine Lernziele definiert. Fügen Sie das erste Lernziel hinzu.
-              </p>
-            ) : (
-              subject.learningGoals.map(goal => (
-                <div key={goal.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    {goal.type === 'basic' ? <Circle className="w-4 h-4" /> : <Star className="w-4 h-4" />}
-                    <span className="text-xs">
-                      {goal.type === 'basic' ? 'Grund' : 'Erweitert'} (Gew: {goal.weight})
-                    </span>
-                  </div>
-                  
-                  <div className="flex-1">
-                    <div className="font-medium">{goal.title}</div>
-                    {goal.achievedDate && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        Erreicht am: {new Date(goal.achievedDate).toLocaleDateString('de-DE')}
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={goal.status}
-                      onChange={(e) => updateGoalStatus(subject.id, goal.id, e.target.value)}
-                      className="px-3 py-1 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      style={{ color: getStatusColor(goal.status) }}
-                    >
-                      <option value="not_achieved">Noch nicht erreicht</option>
-                      <option value="partial">Teilweise erreicht</option>
-                      <option value="achieved">Erreicht</option>
-                    </select>
-                    
-                    {(goal.status === 'achieved' || goal.status === 'partial') && (
-                      <input
-                        type="date"
-                        value={goal.achievedDate || ''}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          updateGoalStatus(subject.id, goal.id, goal.status, e.target.value);
-                        }}
-                        className="px-2 py-1 border rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onKeyDown={(e) => e.stopPropagation()}
-                      />
-                    )}
-                  </div>
-                  
-                  <button
-                    onClick={() => removeGoal(subject.id, goal.id)}
-                    className="p-1 text-red-600 hover:bg-red-100 rounded transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
-  const currentSubject = subjects.find(s => activeTab === `subject-${s.id}`);
-
-  return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <BookOpen className="w-6 h-6" />
-            Kompetenzorientiertes Portfolio
-          </h1>
-        </div>
-      </div>
-      
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          {/* Sidebar */}
-          <div className="w-64 bg-white rounded-lg shadow-sm border p-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold">Fächer</h2>
-              <button
-                onClick={() => setShowAddSubject(true)}
-                className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+            <!-- User ID Display -->
+            <div id="userIdDisplay" class="text-xs text-slate-500 mb-4 truncate">
+                Lade Benutzer-ID...
             </div>
-            
-            {showAddSubject && (
-              <div className="mb-4 p-3 bg-gray-50 rounded">
-                <input
-                  type="text"
-                  value={newSubjectName}
-                  onChange={(e) => setNewSubjectName(e.target.value)}
-                  placeholder="Fachname"
-                  className="w-full px-2 py-1 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addSubject();
-                    }
-                  }}
-                />
-                <div className="flex gap-2 mt-2">
-                  <button
-                    onClick={addSubject}
-                    className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                  >
-                    Hinzufügen
-                  </button>
-                  <button
-                    onClick={() => {setShowAddSubject(false); setNewSubjectName('');}}
-                    className="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400"
-                  >
-                    Abbrechen
-                  </button>
+
+            <!-- Student Management Dropdown -->
+            <div class="flex flex-col gap-2 mb-6">
+                <label for="student-select" class="font-semibold text-slate-500 text-sm uppercase tracking-wider">Aktueller Schüler</label>
+                <div class="relative">
+                    <select id="student-select" class="block w-full p-2 border border-slate-300 rounded-md bg-white pr-8 text-slate-800 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700">
+                        <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
                 </div>
-              </div>
-            )}
-            
-            <nav className="space-y-1">
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                  activeTab === 'overview' ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'
-                }`}
-              >
-                Übersicht
-              </button>
-              
-              {subjects.map(subject => (
-                <div key={subject.id} className="flex items-center group">
-                  <button
-                    onClick={() => setActiveTab(`subject-${subject.id}`)}
-                    className={`flex-1 text-left px-3 py-2 rounded transition-colors ${
-                      activeTab === `subject-${subject.id}` ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100'
-                    }`}
-                  >
-                    {subject.name}
-                  </button>
-                  <button
-                    onClick={() => removeSubject(subject.id)}
-                    className="p-1 text-red-600 opacity-0 group-hover:opacity-100 hover:bg-red-100 rounded transition-all"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
+            </div>
+
+            <div class="mb-4">
+                <button id="showAddStudentBtn" class="w-full flex items-center justify-center gap-2 px-3 py-2 bg-indigo-600 text-white font-bold rounded-md hover:bg-indigo-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Neuen Schüler hinzufügen</span>
+                </button>
+            </div>
+            <div id="addStudentForm" class="hidden mb-6 p-3 bg-slate-50 rounded-lg transition-all">
+                <input type="text" id="newStudentName" placeholder="Name des Schülers..." class="w-full px-2 py-1.5 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <div class="flex gap-2 mt-2">
+                    <button id="addStudentBtn" class="flex-1 px-3 py-1.5 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700 transition-colors">Hinzufügen</button>
+                    <button id="cancelAddStudentBtn" class="flex-1 px-3 py-1.5 bg-slate-200 text-slate-700 text-sm rounded-md hover:bg-slate-300 transition-colors">Abbrechen</button>
                 </div>
-              ))}
-            </nav>
-          </div>
-          
-          {/* Main Content */}
-          <div className="flex-1">
-            {activeTab === 'overview' ? (
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-lg shadow-sm border">
-                  <h2 className="text-xl font-semibold mb-4">Portfolio-Übersicht</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {subjects.map(subject => {
-                      const totalGoals = subject.learningGoals.length;
-                      const achievedGoals = subject.learningGoals.filter(g => g.status === 'achieved').length;
-                      const partialGoals = subject.learningGoals.filter(g => g.status === 'partial').length;
-                      
-                      return (
-                        <div key={subject.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-                          <h3 className="font-semibold mb-2">{subject.name}</h3>
-                          <div className="text-sm text-gray-600 space-y-1">
-                            <div>Lernziele gesamt: {totalGoals}</div>
-                            <div className="text-green-600">Erreicht: {achievedGoals}</div>
-                            <div className="text-yellow-600">Teilweise: {partialGoals}</div>
-                            <div className="text-red-600">Offen: {totalGoals - achievedGoals - partialGoals}</div>
-                          </div>
-                          <button
-                            onClick={() => setActiveTab(`subject-${subject.id}`)}
-                            className="mt-3 px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
-                          >
-                            Details anzeigen
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            ) : currentSubject ? (
-              <SubjectManagement subject={currentSubject} />
-            ) : (
-              <div className="bg-white p-6 rounded-lg shadow-sm border text-center">
-                <p className="text-gray-500">Fach nicht gefunden</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+            </div>
+
+            <!-- Master Goals Button -->
+            <div class="mb-4">
+                <button id="showMasterGoalsBtn" class="w-full flex items-center gap-2 px-3 py-2 rounded-md transition-colors text-slate-700 hover:bg-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                    <span class="font-semibold">Master-Lernziele & Fächer</span>
+                </button>
+            </div>
+
+            <hr class="border-t border-slate-200 my-4"> <!-- Separator -->
+
+            <!-- Overview Button for active student -->
+            <div class="mb-4">
+                <button id="showOverviewBtn" class="w-full flex items-center gap-2 px-3 py-2 rounded-md transition-colors text-slate-700 hover:bg-slate-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18.7 8.3L12 15l-3.3-3.3c-.6-.6-1.4-.6-2-.1-.6.5-.7 1.4-.2 2L10 18l10-10"></path></svg>
+                    <span class="font-semibold">Übersicht (Aktueller Schüler)</span>
+                </button>
+            </div>
+
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="font-semibold text-slate-500 text-sm uppercase tracking-wider">Fächer (Aktueller Schüler)</h2>
+            </div>
+            <nav id="subject-nav" class="space-y-1 overflow-y-auto custom-scrollbar"></nav>
+        </aside>
+
+        <!-- --- Main Content --- -->
+        <main id="main-content" class="flex-1 p-4 md:p-8 overflow-y-auto">
+            <!-- Content will be rendered here by JavaScript -->
+            <div id="loading-spinner" class="flex items-center justify-center h-full hidden">
+                <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500"></div>
+            </div>
+        </main>
     </div>
-  );
-};
 
-export default PortfolioDashboard;
+<script type="module">
+    // Firebase Imports for Realtime Database
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    // Realtime Database specific imports
+    import { getDatabase, ref, set, get, child, onValue, remove, update, push } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    // Global Firebase instances
+    let app;
+    let db; // Renamed from firestoreDB
+    let auth;
+    let unsubscribeMasterGoals = null; // To store unsubscribe function for master goals listener
+    let unsubscribeMasterSubjects = null; // To store unsubscribe function for master subjects listener
+    let unsubscribeStudents = null; // To store unsubscribe function for students listener
+
+    // Global variables provided by the Canvas environment (MUST BE USED)
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+    // --- STATE MANAGEMENT ---
+    let appState = {
+        students: {}, // studentId: { id, name, subjects: { 'FachName': { 'goalId': { ... } } } }
+        masterGoals: [], // [{ id, subjectName, text, category, weight }]
+        masterSubjects: [], // Array of unique subject names (strings)
+        activeStudent: null, // ID of the currently selected student
+        activeSubject: null, // null for overview, subject name for subject view (for active student)
+        viewMode: 'studentOverview', // 'studentOverview', 'studentSubject', 'masterGoals'
+        userId: null, // New: to store authenticated user ID
+        isAuthReady: false // New: to indicate Firebase auth is ready
+    };
+
+    // Defines information for each status category, including Tailwind colors and Chart.js colors
+    const statusInfo = {
+        erreicht: {
+            label: 'Erreicht',
+            color: 'bg-emerald-500', // Tailwind class for status indicator
+            chartBg: 'rgba(52, 211, 153, 0.4)', // Chart.js background for line charts (lighter opacity)
+            chartBgOpaque: 'rgba(52, 211, 153, 1.0)', // Chart.js background for 100% opaque bubbles
+            chartBgTransparent: 'rgba(52, 211, 153, 0.1)', // Chart.js background for 10% opaque bubbles
+            chartBorder: 'rgba(16, 185, 129, 1)', // Chart.js border for line charts
+            pieColorOpaque: '#34d399', // 100% opacity for pie charts
+            pieColorTransparent: 'rgba(52, 211, 153, 0.1)', // 10% opacity for pie charts
+            bubbleBorderColor: 'rgba(16, 185, 129, 1)' // Consistent border color for bubbles
+        },
+        teilweise: {
+            label: 'Teilweise',
+            color: 'bg-amber-500',
+            chartBg: 'rgba(251, 191, 36, 0.4)',
+            chartBgOpaque: 'rgba(251, 191, 36, 1.0)',
+            chartBgTransparent: 'rgba(251, 191, 36, 0.1)',
+            chartBorder: 'rgba(245, 158, 11, 1)',
+            pieColorOpaque: '#f59e0b',
+            pieColorTransparent: 'rgba(251, 191, 36, 0.1)',
+            bubbleBorderColor: 'rgba(245, 158, 11, 1)'
+        },
+        nicht: {
+            label: 'Nicht erreicht',
+            color: 'bg-red-500',
+            chartBg: 'rgba(248, 113, 113, 0.4)',
+            chartBgOpaque: 'rgba(248, 113, 113, 1.0)',
+            chartBgTransparent: 'rgba(248, 113, 113, 0.1)',
+            chartBorder: 'rgba(239, 68, 68, 1)',
+            pieColorOpaque: '#ef4444',
+            pieColorTransparent: 'rgba(248, 113, 113, 0.1)',
+            bubbleBorderColor: 'rgba(239, 68, 68, 1)'
+        }
+    };
+
+    // Holds Chart.js instances to allow for their destruction before re-rendering
+    let charts = {
+        timelineGrund: null,
+        timelineErweitert: null,
+        bubbleChart: null,
+        weightedPieChartGrundInitial: null,
+        weightedPieChartGrundCorrected: null,
+        weightedPieChartErweitertInitial: null,
+        weightedPieChartErweitertCorrected: null,
+    };
+
+    // --- DOM SELECTORS ---
+    const mainContent = document.getElementById('main-content');
+    const subjectNav = document.getElementById('subject-nav');
+    const studentSelect = document.getElementById('student-select'); // New dropdown
+    const showOverviewBtn = document.getElementById('showOverviewBtn');
+    const showMasterGoalsBtn = document.getElementById('showMasterGoalsBtn'); // New button
+    const loadingSpinner = document.getElementById('loading-spinner'); // Loading spinner element
+    const userIdDisplay = document.getElementById('userIdDisplay'); // User ID display element
+
+    // Student management selectors
+    const showAddStudentBtn = document.getElementById('showAddStudentBtn');
+    const addStudentForm = document.getElementById('addStudentForm');
+    const newStudentNameInput = document.getElementById('newStudentName');
+    const addStudentBtn = document.getElementById('addStudentBtn');
+    const cancelAddStudentBtn = document.getElementById('cancelAddStudentBtn');
+
+    // --- FIREBASE INITIALIZATION & AUTHENTICATION ---
+    async function initializeFirebase() {
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getDatabase(app); // Initialisiere Realtime Database
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    appState.userId = user.uid;
+                    userIdDisplay.textContent = `User ID: ${user.uid}`;
+                    appState.isAuthReady = true;
+                    console.log('Firebase Auth bereit. User ID:', appState.userId);
+                    await loadDatabaseData(); // Starte das Laden der Realtime Database Daten
+                } else {
+                    appState.userId = null;
+                    appState.isAuthReady = false;
+                    userIdDisplay.textContent = 'Nicht angemeldet';
+                    console.log('Firebase Auth nicht bereit. Melde mich an...');
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (signInError) {
+                        console.error("Fehler bei der Anmeldung:", signInError);
+                        userIdDisplay.textContent = 'Fehler bei der Anmeldung';
+                    }
+                }
+            });
+        } catch (error) {
+            console.error("Fehler beim Initialisieren von Firebase:", error);
+            userIdDisplay.textContent = 'Firebase-Fehler: ' + error.message;
+        }
+    }
+
+    // --- REALTIME DATABASE DATA LOADING ---
+    async function loadDatabaseData() {
+        if (!appState.isAuthReady || !db) return;
+
+        showLoadingSpinner();
+
+        // Unsubscribe from previous listeners if they exist
+        if (unsubscribeMasterGoals) unsubscribeMasterGoals();
+        if (unsubscribeMasterSubjects) unsubscribeMasterSubjects();
+        if (unsubscribeStudents) unsubscribeStudents();
+
+        try {
+            const userRootRef = ref(db, `artifacts/${appId}/users/${appState.userId}`);
+            const masterSubjectsRef = child(userRootRef, 'master_data/master_subjects');
+            const masterGoalsRef = child(userRootRef, 'master_data/master_goals');
+            const studentsRef = child(userRootRef, 'students');
+
+            // Listener for Master Subjects
+            unsubscribeMasterSubjects = onValue(masterSubjectsRef, (snapshot) => {
+                const newMasterSubjects = [];
+                snapshot.forEach((childSnapshot) => {
+                    newMasterSubjects.push(childSnapshot.key); // Subject name is the key
+                });
+                newMasterSubjects.sort();
+                appState.masterSubjects = newMasterSubjects;
+                console.log("Master subjects loaded:", appState.masterSubjects);
+                render();
+            }, (error) => {
+                console.error("Error fetching master subjects:", error);
+            });
+
+            // Listener for Master Goals
+            unsubscribeMasterGoals = onValue(masterGoalsRef, (snapshot) => {
+                const newMasterGoals = [];
+                snapshot.forEach((childSnapshot) => {
+                    newMasterGoals.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                });
+                appState.masterGoals = newMasterGoals;
+                console.log("Master goals loaded:", appState.masterGoals);
+                synchronizeStudentsWithMasterGoals(); // Re-sync students whenever master goals change
+                render();
+            }, (error) => {
+                console.error("Error fetching master goals:", error);
+            });
+
+            // Listener for Student Data
+            unsubscribeStudents = onValue(studentsRef, (snapshot) => {
+                const newStudents = {};
+                snapshot.forEach((childSnapshot) => {
+                    newStudents[childSnapshot.key] = { id: childSnapshot.key, ...childSnapshot.val() };
+                });
+                appState.students = newStudents;
+                console.log("Students loaded:", appState.students);
+
+                // Adjust active student/subject if they became invalid
+                if (appState.activeStudent && !appState.students[appState.activeStudent]) {
+                    appState.activeStudent = Object.keys(appState.students)[0] || null;
+                    appState.activeSubject = null;
+                    appState.viewMode = 'studentOverview';
+                }
+                if (appState.activeStudent && appState.activeSubject && (!appState.students[appState.activeStudent].subjects || !appState.students[appState.activeStudent].subjects[appState.activeSubject])) {
+                    appState.activeSubject = null;
+                    appState.viewMode = 'studentOverview';
+                }
+                if (!appState.activeStudent && Object.keys(appState.students).length > 0) {
+                    appState.activeStudent = Object.keys(appState.students)[0];
+                    appState.activeSubject = null;
+                    appState.viewMode = 'studentOverview';
+                } else if (!appState.activeStudent && Object.keys(appState.students).length === 0) {
+                    appState.viewMode = 'masterGoals'; // Default to masterGoals page if no students
+                }
+
+                render();
+                hideLoadingSpinner();
+            }, (error) => {
+                console.error("Error fetching students:", error);
+                hideLoadingSpinner();
+            });
+
+            // Check if initial data needs to be added
+            const initialMasterGoalsSnapshot = await get(masterGoalsRef);
+            if (!initialMasterGoalsSnapshot.exists()) {
+                console.log("No master goals found, initializing with sample data.");
+                await initializeMasterGoalsAndSubjects();
+            }
+
+        } catch (error) {
+            console.error("Error setting up Realtime Database listeners:", error);
+            hideLoadingSpinner();
+        }
+    }
+
+    async function initializeMasterGoalsAndSubjects() {
+        const userRootRef = ref(db, `artifacts/${appId}/users/${appState.userId}`);
+        const masterSubjectsRef = child(userRootRef, 'master_data/master_subjects');
+        const masterGoalsRef = child(userRootRef, 'master_data/master_goals');
+
+        // Add initial master subjects
+        const initialSubjects = ['Mathematik', 'Deutsch', 'Englisch'];
+        const subjectUpdates = {};
+        initialSubjects.forEach(subjectName => {
+            subjectUpdates[subjectName] = { name: subjectName };
+        });
+        try {
+            await set(masterSubjectsRef, subjectUpdates);
+        } catch (e) {
+            console.error("Error adding initial master subjects:", e);
+        }
+
+        // Add initial master goals
+        const sampleGoals = [
+            { subjectName: 'Mathematik', text: 'Bruchrechnung verstehen', category: 'grund', weight: 3 },
+            { subjectName: 'Mathematik', text: 'Gleichungen lösen', category: 'grund', weight: 4 },
+            { subjectName: 'Mathematik', text: 'Komplexe Textaufgaben', category: 'erweitert', weight: 5 },
+            { subjectName: 'Deutsch', text: 'Rechtschreibung beherrschen', category: 'grund', weight: 4 },
+            { subjectName: 'Deutsch', text: 'Grammatik anwenden', category: 'grund', weight: 3 },
+            { subjectName: 'Englisch', text: 'Vokabeln A1 beherrschen', category: 'grund', weight: 3 }
+        ];
+        try {
+            sampleGoals.forEach(goal => {
+                push(masterGoalsRef, goal); // push generates unique ID
+            });
+        } catch (e) {
+            console.error("Error adding initial master goals:", e);
+        }
+    }
+
+    // Clones a master goal into a student-specific goal object
+    function cloneMasterGoalToStudentGoal(masterGoal) {
+        return {
+            id: 'sg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9), // Unique ID for student's instance
+            masterGoalId: masterGoal.id, // Reference to master goal
+            text: masterGoal.text,
+            category: masterGoal.category,
+            weight: masterGoal.weight,
+            subjectName: masterGoal.subjectName, // Keep subjectName for easier filtering
+            revisions: [] // Always start with empty revisions for a new student goal
+        };
+    }
+
+    // Synchronizes existing student data with current master goals
+    async function synchronizeStudentsWithMasterGoals() {
+        if (!appState.masterGoals.length || !appState.isAuthReady) return;
+
+        const studentsRef = ref(db, `artifacts/${appId}/users/${appState.userId}/students`);
+        const studentsSnapshot = await get(studentsRef);
+        const studentsData = studentsSnapshot.val() || {};
+
+        for (const studentId in studentsData) {
+            const student = studentsData[studentId];
+            const synchronizedSubjects = student.subjects || {};
+            const currentStudentGoalsMap = {}; // Map of masterGoalId to student goal for quick lookup
+
+            // Populate currentStudentGoalsMap
+            if (synchronizedSubjects) {
+                for (const subjectName in synchronizedSubjects) {
+                    const subjectGoals = synchronizedSubjects[subjectName];
+                    if (subjectGoals) {
+                        for (const goalId in subjectGoals) {
+                            const sGoal = subjectGoals[goalId];
+                            if (sGoal.masterGoalId) {
+                                currentStudentGoalsMap[sGoal.masterGoalId] = sGoal;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Iterate through master goals to update/add to student
+            appState.masterGoals.forEach(mGoal => {
+                const existingStudentGoal = currentStudentGoalsMap[mGoal.id];
+
+                if (existingStudentGoal) {
+                    // Update master-controlled fields of existing student goal
+                    existingStudentGoal.text = mGoal.text;
+                    existingStudentGoal.category = mGoal.category;
+                    existingStudentGoal.weight = mGoal.weight;
+
+                    // If subjectName changed, move the goal to the new subject array
+                    if (existingStudentGoal.subjectName !== mGoal.subjectName) {
+                        const oldSubjectName = existingStudentGoal.subjectName;
+                        if (synchronizedSubjects[oldSubjectName]) {
+                            // Delete the goal from the old subject's object
+                            delete synchronizedSubjects[oldSubjectName][existingStudentGoal.id];
+                            if (Object.keys(synchronizedSubjects[oldSubjectName]).length === 0) {
+                                delete synchronizedSubjects[oldSubjectName];
+                            }
+                        }
+                        existingStudentGoal.subjectName = mGoal.subjectName; // Update internal subjectName
+                        if (!synchronizedSubjects[mGoal.subjectName]) {
+                            synchronizedSubjects[mGoal.subjectName] = {};
+                        }
+                        // Assign the existing goal back to the new subject's object using its original ID as key.
+                        synchronizedSubjects[mGoal.subjectName][existingStudentGoal.id] = existingStudentGoal;
+                    }
+                } else {
+                    // Add new master goal to student
+                    if (!synchronizedSubjects[mGoal.subjectName]) {
+                        synchronizedSubjects[mGoal.subjectName] = {};
+                    }
+                    const newStudentGoal = cloneMasterGoalToStudentGoal(mGoal);
+                    // Use the auto-generated ID from cloneMasterGoalToStudentGoal as the key in RTDB for consistency
+                    newStudentGoal.id = newStudentGoal.id; // Ensure 'id' is a direct property, not just a key
+                    synchronizedSubjects[mGoal.subjectName][newStudentGoal.id] = newStudentGoal;
+                }
+            });
+
+            // Remove student goals whose master goals no longer exist
+            for (const subjName in synchronizedSubjects) {
+                if (synchronizedSubjects[subjName]) {
+                    for (const goalKey in synchronizedSubjects[subjName]) {
+                        const sGoal = synchronizedSubjects[subjName][goalKey];
+                        if (sGoal && !appState.masterGoals.some(mGoal => mGoal.id === sGoal.masterGoalId)) {
+                            delete synchronizedSubjects[subjName][goalKey];
+                        }
+                    }
+                    if (Object.keys(synchronizedSubjects[subjName]).length === 0) {
+                        delete synchronizedSubjects[subjName];
+                    }
+                }
+            }
+            
+            // Only update the student data if there are actual changes
+            const studentRef = ref(db, `artifacts/${appId}/users/${appState.userId}/students/${studentId}`);
+            await set(studentRef, { ...student, subjects: synchronizedSubjects });
+        }
+    }
+
+    // --- REALTIME DATABASE CRUD OPERATIONS ---
+
+    // Adds a new student to Realtime Database
+    async function addStudent() {
+        const name = newStudentNameInput.value.trim();
+        if (!name || !appState.isAuthReady) return;
+
+        // Check for duplicate student names (optional, but good practice)
+        const studentsSnapshot = await get(ref(db, `artifacts/${appId}/users/${appState.userId}/students`));
+        const existingStudents = studentsSnapshot.val() || {};
+        const isDuplicate = Object.values(existingStudents).some(s => s.name === name);
+        if (isDuplicate) {
+             const message = document.createElement('div');
+            message.className = 'fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-[100]';
+            message.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                    <p class="mt-4 text-slate-700">Ein Schüler mit diesem Namen existiert bereits!</p>
+                    <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" onclick="this.parentNode.parentNode.remove()">OK</button>
+                </div>
+            `;
+            document.body.appendChild(message);
+            return;
+        }
+
+        const studentsListRef = ref(db, `artifacts/${appId}/users/${appState.userId}/students`);
+        const newStudentRef = push(studentsListRef); // Get a new unique key for the student
+        const studentId = newStudentRef.key;
+
+        const newStudentSubjects = {};
+        // Clone all current master goals for the new student
+        appState.masterGoals.forEach(mGoal => {
+            if (!newStudentSubjects[mGoal.subjectName]) {
+                newStudentSubjects[mGoal.subjectName] = {}; // Use object for goals within subject
+            }
+            const studentGoal = cloneMasterGoalToStudentGoal(mGoal);
+            newStudentSubjects[mGoal.subjectName][studentGoal.id] = studentGoal; // Use its ID as key
+        });
+
+        try {
+            await set(newStudentRef, {
+                id: studentId,
+                name: name,
+                subjects: newStudentSubjects
+            });
+            console.log("Student added with ID:", studentId);
+            appState.activeStudent = studentId; // Set new student as active
+            appState.activeSubject = null;
+            appState.viewMode = 'studentOverview';
+            newStudentNameInput.value = '';
+            addStudentForm.classList.add('hidden');
+        } catch (e) {
+            console.error("Error adding student:", e);
+        }
+    }
+
+    // Removes a student from Realtime Database after user confirmation
+    async function removeStudent(studentId) {
+        if (!appState.isAuthReady) return;
+        const studentName = appState.students[studentId]?.name;
+        const message = `Sind Sie sicher, dass Sie den Schüler "${studentName}" und alle seine Daten löschen möchten?`;
+        showConfirmationModal(message, async () => {
+            try {
+                await remove(ref(db, `artifacts/${appId}/users/${appState.userId}/students/${studentId}`));
+                console.log("Student removed:", studentId);
+            } catch (e) {
+                console.error("Error removing student:", e);
+            }
+        });
+    }
+
+    // Adds a new master subject to Realtime Database
+    async function addMasterSubject(subjectName) {
+        if (!subjectName || !appState.isAuthReady) return;
+        try {
+            // Check if subject already exists
+            const subjectSnapshot = await get(ref(db, `artifacts/${appId}/users/${appState.userId}/master_data/master_subjects/${subjectName}`));
+            if (subjectSnapshot.exists()) {
+                const message = document.createElement('div');
+                message.className = 'fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-[100]';
+                message.innerHTML = `
+                    <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                        <p class="mt-4 text-slate-700">Das Fach "${subjectName}" existiert bereits!</p>
+                        <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" onclick="this.parentNode.parentNode.remove()">OK</button>
+                    </div>
+                `;
+                document.body.appendChild(message);
+                return;
+            }
+            await set(ref(db, `artifacts/${appId}/users/${appState.userId}/master_data/master_subjects/${subjectName}`), { name: subjectName });
+            console.log("Master subject added:", subjectName);
+        } catch (e) {
+            console.error("Error adding master subject:", e);
+        }
+    }
+
+    // Removes a master subject from Realtime Database
+    async function removeMasterSubject(subjectName) {
+        if (!appState.isAuthReady) return;
+        const message = `Sind Sie sicher, dass Sie das Fach "${subjectName}" aus der Masterliste löschen möchten? Dies wird ALLE zugehörigen Master-Lernziele und ihre Instanzen in ALLEN Schülerportfolios entfernen!`;
+        showConfirmationModal(message, async () => {
+            try {
+                // Remove associated masterGoals first
+                const masterGoalsRef = ref(db, `artifacts/${appId}/users/${appState.userId}/master_data/master_goals`);
+                const masterGoalsSnapshot = await get(masterGoalsRef);
+                masterGoalsSnapshot.forEach(goalSnapshot => {
+                    if (goalSnapshot.val().subjectName === subjectName) {
+                        remove(goalSnapshot.ref);
+                    }
+                });
+
+                // Remove the subject itself
+                await remove(ref(db, `artifacts/${appId}/users/${appState.userId}/master_data/master_subjects/${subjectName}`));
+
+                // This will trigger loadDatabaseData() via onValue listeners and re-synchronize students
+                console.log("Master subject removed:", subjectName);
+            } catch (e) {
+                console.error("Error removing master subject:", e);
+            }
+        });
+    }
+
+    // Adds a new master goal to Realtime Database
+    async function addMasterGoal(newMasterGoal) {
+        if (!appState.isAuthReady) return;
+        try {
+            await push(ref(db, `artifacts/${appId}/users/${appState.userId}/master_data/master_goals`), newMasterGoal);
+            console.log("Master goal added:", newMasterGoal.text);
+        } catch (e) {
+            console.error("Error adding master goal:", e);
+        }
+    }
+
+    // Removes a master goal from Realtime Database
+    async function removeMasterGoal(masterGoalId) {
+        if (!appState.isAuthReady) return;
+        const message = `Sind Sie sicher, dass Sie dieses Master-Lernziel löschen möchten? Dies wird es auch aus ALLEN Schülerportfolios entfernen.`;
+        showConfirmationModal(message, async () => {
+            try {
+                await remove(ref(db, `artifacts/${appId}/users/${appState.userId}/master_data/master_goals/${masterGoalId}`));
+                console.log("Master goal removed:", masterGoalId);
+            } catch (e) {
+                console.error("Error removing master goal:", e);
+            }
+        });
+    }
+
+    // Updates an existing master goal in Realtime Database
+    async function updateMasterGoal(masterGoalId, updatedFields) {
+        if (!appState.isAuthReady) return;
+        try {
+            await update(ref(db, `artifacts/${appId}/users/${appState.userId}/master_data/master_goals/${masterGoalId}`), updatedFields);
+            console.log("Master goal updated:", masterGoalId);
+        } catch (e) {
+            console.error("Error updating master goal:", e);
+        }
+    }
+
+    // Updates a specific revision (initial or final) of a goal for the active student in Realtime Database
+    async function updateGoalRevision(goalId, newStatus, newDate, isInitialRevision) {
+        if (!appState.activeStudent || !appState.activeSubject || !appState.isAuthReady) return;
+
+        const studentGoalRef = ref(db, `artifacts/${appId}/users/${appState.userId}/students/${appState.activeStudent}/subjects/${appState.activeSubject}/${goalId}`);
+        const snapshot = await get(studentGoalRef);
+        const goal = snapshot.val();
+
+        if (!goal) return;
+
+        let updatedRevisions = goal.revisions || [];
+
+        if (isInitialRevision) {
+            if (updatedRevisions.length === 0) {
+                updatedRevisions.push({ date: newDate, status: newStatus });
+            } else {
+                updatedRevisions[0] = { date: newDate, status: newStatus };
+            }
+        } else { // Nach Korrektur (final revision)
+            if (updatedRevisions.length === 0) { // If no initial revision, add it as first
+                updatedRevisions.push({ date: newDate, status: newStatus });
+            } else if (updatedRevisions.length === 1) { // If only initial, add as second
+                updatedRevisions.push({ date: newDate, status: newStatus });
+            } else { // Update last
+                updatedRevisions[updatedRevisions.length - 1] = { date: newDate, status: newStatus };
+            }
+        }
+        updatedRevisions.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        try {
+            await update(studentGoalRef, { revisions: updatedRevisions });
+            console.log("Goal revision updated for goal:", goalId);
+        } catch (e) {
+            console.error("Error updating goal revision:", e);
+        }
+    }
+
+    // Removes a subject (and its goals) *only for the active student* from Realtime Database.
+    async function removeSubjectFromStudent(subjectName) {
+        if (!appState.activeStudent || !appState.isAuthReady) return;
+        const studentName = appState.students[appState.activeStudent]?.name;
+        const message = `Sind Sie sicher, dass Sie das Fach "${subjectName}" und alle zugehörigen Lernziele für ${studentName} löschen möchten? (Dies entfernt das Fach nur für diesen Schüler, nicht aus den Master-Lernzielen.)`;
+        showConfirmationModal(message, async () => {
+            try {
+                // Remove the entire subject object for this student
+                await remove(ref(db, `artifacts/${appId}/users/${appState.userId}/students/${appState.activeStudent}/subjects/${subjectName}`));
+                console.log(`Subject ${subjectName} removed for student ${studentName}`);
+            } catch (e) {
+                console.error("Error removing subject from student:", e);
+            }
+        });
+    }
+
+    // --- MODAL DIALOG for confirmations and updates ---
+    // Displays a custom confirmation modal instead of native alert/confirm
+    function showConfirmationModal(message, onConfirm) {
+        const existingModal = document.getElementById('confirmationModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        const modalHTML = `
+            <div id="confirmationModal" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+                    <p class="text-slate-800 mb-4">${message}</p>
+                    <div class="flex justify-end gap-3">
+                        <button id="modalCancelBtn" class="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300 transition">Abbrechen</button>
+                        <button id="modalConfirmBtn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition">Löschen</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        const modal = document.getElementById('confirmationModal');
+        const confirmBtn = document.getElementById('modalConfirmBtn');
+        const cancelBtn = document.getElementById('modalCancelBtn');
+
+        confirmBtn.onclick = () => {
+            onConfirm();
+            modal.remove();
+        };
+        cancelBtn.onclick = () => {
+            modal.remove();
+        };
+    }
+
+    // Displays a modal to update a goal's status
+    function showUpdateStatusModal(goalId) {
+        const existingModal = document.getElementById('updateStatusModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        if (!appState.activeStudent || !appState.activeSubject) return;
+        // Fetch the specific goal data as it might not be fully up-to-date in appState yet
+        const goal = appState.students[appState.activeStudent]?.subjects?.[appState.activeSubject]?.[goalId];
+        if (!goal) return;
+
+        const initialRevision = goal.revisions?.length > 0 ? goal.revisions[0] : null;
+        const finalRevision = goal.revisions?.length > 1 ? goal.revisions[goal.revisions.length - 1] : null;
+
+        const modalHTML = `
+            <div id="updateStatusModal" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-slate-800">Lernziel Status aktualisieren</h3>
+                        <button id="modalCloseBtn" class="text-slate-400 hover:text-slate-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+
+                    <!-- Section for Initial Evaluation -->
+                    <div class="mb-4 border p-4 rounded-md bg-slate-50">
+                        <h4 class="font-medium text-slate-700 mb-3 text-base">Beurteilung vor Korrektur</h4>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Status:</label>
+                                <select id="initialStatusSelect" class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                    <option value="erreicht">Erreicht</option>
+                                    <option value="teilweise">Teilweise</option>
+                                    <option value="nicht">Nicht erreicht</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Datum:</label>
+                                <input type="date" id="initialDateInput" required class="w-full p-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                            </div>
+                            <button id="updateInitialBtn" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-md text-base hover:bg-indigo-700 transition">Aktualisieren (Vor Korrektur)</button>
+                        </div>
+                    </div>
+
+                    <!-- Section for Final Evaluation -->
+                    <div class="mb-4 border p-4 rounded-md bg-slate-50">
+                        <h4 class="font-medium text-slate-700 mb-3 text-base">Beurteilung nach Korrektur</h4>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Status:</label>
+                                <select id="finalStatusSelect" class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                    <option value="erreicht">Erreicht</option>
+                                    <option value="teilweise">Teilweise</option>
+                                    <option value="nicht">Nicht erreicht</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-600 mb-1">Datum:</label>
+                                <input type="date" id="finalDateInput" required class="w-full p-2 border border-slate-300 rounded-md text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                            </div>
+                            <button id="updateFinalBtn" class="w-full bg-emerald-600 text-white font-bold py-2 px-4 rounded-md text-base hover:bg-emerald-700 transition">Aktualisieren (Nach Korrektur)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        const modal = document.getElementById('updateStatusModal');
+        const initialStatusSelect = document.getElementById('initialStatusSelect');
+        const initialDateInput = document.getElementById('initialDateInput');
+        const updateInitialBtn = document.getElementById('updateInitialBtn');
+
+        const finalStatusSelect = document.getElementById('finalStatusSelect');
+        const finalDateInput = document.getElementById('finalDateInput');
+        const updateFinalBtn = document.getElementById('updateFinalBtn');
+        const modalCloseBtn = document.getElementById('modalCloseBtn'); // New close button
+
+        // Populate initial fields
+        if (initialRevision) {
+             initialStatusSelect.value = initialRevision.status;
+             initialDateInput.value = initialRevision.date;
+        } else {
+             // If no initial revision, set today's date as default
+            initialDateInput.valueAsDate = new Date();
+            initialStatusSelect.value = 'nicht'; // Default to 'nicht erreicht' for new goals
+        }
+
+        // Populate final fields
+        if (finalRevision) {
+            finalStatusSelect.value = finalRevision.status;
+            finalDateInput.value = finalRevision.date;
+        } else {
+            // If no final revision, set today's date as default for adding one
+            finalDateInput.valueAsDate = new Date();
+            finalStatusSelect.value = initialRevision ? initialRevision.status : 'nicht'; // Default to initial or 'nicht'
+        }
+
+        updateInitialBtn.onclick = () => {
+            updateGoalRevision(goalId, initialStatusSelect.value, initialDateInput.value, true); // true for initial
+            modal.remove();
+        };
+
+        updateFinalBtn.onclick = () => {
+            updateGoalRevision(goalId, finalStatusSelect.value, finalDateInput.value, false); // false for final
+            modal.remove();
+        };
+        
+        modalCloseBtn.onclick = () => { // Event listener for the new close button
+            modal.remove();
+        };
+    }
+
+    // Displays a modal to edit a master goal
+    function showEditMasterGoalModal(masterGoalId) {
+        const existingModal = document.getElementById('editMasterGoalModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+
+        const masterGoal = appState.masterGoals.find(mg => mg.id === masterGoalId);
+        if (!masterGoal) return;
+
+        const modalHTML = `
+            <div id="editMasterGoalModal" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-md max-h-[70vh] flex flex-col">
+                    <h3 class="text-xl font-semibold mb-4 text-slate-800">Master-Lernziel bearbeiten</h3>
+                    <form id="editMasterGoalForm" class="space-y-4 overflow-y-auto pr-2 custom-scrollbar">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Text:</label>
+                            <input type="text" id="editMasterGoalText" class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500" value="${masterGoal.text}" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Fach:</label>
+                            <select id="editMasterGoalSubject" class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500" required>
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Kategorie:</label>
+                            <select id="editMasterGoalCategory" class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500">
+                                <option value="grund">Grundanforderung</option>
+                                <option value="erweitert">Erweiterte Anforderung</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Gewichtung (1-5):</label>
+                            <input type="range" id="editMasterGoalWeight" min="1" max="5" class="w-full" value="${masterGoal.weight}">
+                            <span id="editMasterGoalWeightValue" class="text-sm text-slate-600">${masterGoal.weight}</span>
+                        </div>
+                        <div class="flex justify-end gap-3 mt-4">
+                            <button type="button" id="cancelEditMasterGoalBtn" class="px-4 py-2 bg-slate-200 text-slate-800 rounded-md hover:bg-slate-300 transition">Abbrechen</button>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Speichern</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        const modal = document.getElementById('editMasterGoalModal');
+        const form = document.getElementById('editMasterGoalForm');
+        const textInput = document.getElementById('editMasterGoalText');
+        const subjectSelect = document.getElementById('editMasterGoalSubject'); // This is now a select
+        const categorySelect = document.getElementById('editMasterGoalCategory');
+        const weightInput = document.getElementById('editMasterGoalWeight');
+        const weightValueSpan = document.getElementById('editMasterGoalWeightValue');
+        const cancelBtn = document.getElementById('cancelEditMasterGoalBtn');
+
+        // Populate subject dropdown for master goal form
+        subjectSelect.innerHTML = '';
+        appState.masterSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            subjectSelect.appendChild(option);
+        });
+        subjectSelect.value = masterGoal.subjectName; // Set current subject as selected
+
+
+        categorySelect.value = masterGoal.category;
+        weightInput.oninput = (e) => {
+            weightValueSpan.textContent = e.target.value;
+        };
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const updatedFields = {
+                text: textInput.value.trim(),
+                subjectName: subjectSelect.value, // Get value from select
+                category: categorySelect.value,
+                weight: parseInt(weightInput.value, 10)
+            };
+            await updateMasterGoal(masterGoalId, updatedFields);
+            modal.remove();
+        };
+
+        cancelBtn.onclick = () => {
+            modal.remove();
+        };
+    }
+
+    // Shows the loading spinner
+    function showLoadingSpinner() {
+        loadingSpinner.classList.remove('hidden');
+    }
+
+    // Hides the loading spinner
+    function hideLoadingSpinner() {
+        loadingSpinner.classList.add('hidden');
+    }
+
+    // --- RENDERING FUNCTIONS ---
+
+    // Renders the sidebar with student and subject navigation
+    function renderSidebar() {
+        // Render students dropdown
+        studentSelect.innerHTML = '';
+        if (Object.keys(appState.students).length === 0) {
+            studentSelect.innerHTML = '<option value="">Keine Schüler vorhanden</option>';
+            studentSelect.disabled = true;
+        } else {
+            studentSelect.disabled = false;
+            Object.values(appState.students).forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = student.name;
+                studentSelect.appendChild(option);
+            });
+            studentSelect.value = appState.activeStudent;
+        }
+
+        // Attach event listener for student selection
+        studentSelect.onchange = (e) => {
+            appState.activeStudent = e.target.value;
+            appState.activeSubject = null; // Go to overview when changing student
+            appState.viewMode = 'studentOverview';
+            render();
+        };
+
+        // Render subjects for the active student
+        subjectNav.innerHTML = '';
+        if (appState.activeStudent && appState.students[appState.activeStudent] && appState.viewMode !== 'masterGoals') {
+            const studentSubjects = appState.students[appState.activeStudent].subjects;
+            // Get unique subject names that the student has goals for
+            const currentStudentSubjectNames = Object.keys(studentSubjects).filter(subjectName => {
+                // Ensure there's at least one goal in the subject object (not just an empty object)
+                return Object.keys(studentSubjects[subjectName] || {}).length > 0;
+            });
+            currentStudentSubjectNames.sort(); // Sort alphabetically
+
+            currentStudentSubjectNames.forEach(name => {
+                const isActiveSubject = name === appState.activeSubject;
+                const container = document.createElement('div');
+                container.className = 'flex items-center group';
+
+                const button = document.createElement('button');
+                button.className = `flex-1 text-left px-3 py-2 rounded-md transition-colors text-slate-700 ${isActiveSubject ? 'bg-indigo-100 text-indigo-700 font-semibold' : 'hover:bg-slate-100'}`;
+                button.textContent = name;
+                button.onclick = () => {
+                    appState.activeSubject = name;
+                    appState.viewMode = 'studentSubject';
+                    render();
+                };
+
+                // Option to remove subject from THIS student's view
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-100 rounded-md transition-all opacity-0 group-hover:opacity-100';
+                deleteBtn.title = `Fach "${name}" für diesen Schüler entfernen`;
+                deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+                deleteBtn.onclick = async (e) => {
+                    e.stopPropagation();
+                    await removeSubjectFromStudent(name); // Use the new specific function
+                };
+
+                container.appendChild(button);
+                container.appendChild(deleteBtn);
+                subjectNav.appendChild(container);
+            });
+        }
+        
+        // Update button styles based on active view mode
+        if (appState.viewMode === 'studentOverview' && appState.activeStudent !== null) { // Only highlight if a student is active
+            showOverviewBtn.classList.add('bg-indigo-100', 'text-indigo-700', 'font-semibold');
+        } else {
+            showOverviewBtn.classList.remove('bg-indigo-100', 'text-indigo-700', 'font-semibold');
+        }
+
+        if (appState.viewMode === 'masterGoals') {
+            showMasterGoalsBtn.classList.add('bg-indigo-100', 'text-indigo-700', 'font-semibold');
+        } else {
+            showMasterGoalsBtn.classList.remove('bg-indigo-100', 'text-indigo-700', 'font-semibold');
+        }
+    }
+
+    // Renders the main content area based on viewMode
+    function renderMainContent() {
+        // Destroy existing charts to prevent memory leaks and rendering issues
+        for (const chartKey in charts) {
+            if (charts[chartKey]) {
+                charts[chartKey].destroy();
+                charts[chartKey] = null;
+            }
+        }
+
+        if (appState.viewMode === 'masterGoals') {
+            renderMasterGoalsPage();
+        } else if (!appState.activeStudent) {
+            mainContent.innerHTML = `
+                <div class="p-8 bg-white rounded-xl shadow-sm text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-800">Bitte einen Schüler auswählen</h2>
+                    <p class="text-slate-600">Wählen Sie links einen Schüler aus oder fügen Sie einen neuen hinzu, um sein Portfolio anzuzeigen.</p>
+                </div>
+            `;
+        } else if (appState.viewMode === 'studentOverview' || appState.activeSubject === null) {
+            renderOverviewPage();
+        } else if (appState.viewMode === 'studentSubject') {
+            renderSubjectPage(); // Renamed from renderMainContent's subject specific part
+        }
+    }
+
+    // Renders the page for managing master goals
+    function renderMasterGoalsPage() {
+        mainContent.innerHTML = `
+            <div class="p-8 bg-white rounded-xl shadow-sm mb-8">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800">Master-Lernziele verwalten</h2>
+                <form id="masterGoalForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Lernziel Text</label>
+                        <input type="text" name="text" required class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Fach</label>
+                            <select name="subjectName" required class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500">
+                                <!-- Options populated by JS -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Kategorie</label>
+                            <select name="category" class="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500">
+                                <option value="grund">Grundanforderung</option>
+                                <option value="erweitert">Erweiterte Anforderung</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Gewichtung (1-5)</label>
+                        <input type="range" name="weight" min="1" max="5" value="3" class="w-full">
+                        <span id="masterGoalWeightValue" class="text-sm text-slate-600">3</span>
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-indigo-700 transition">Master-Lernziel hinzufügen</button>
+                </form>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm mb-8">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800">Fächer verwalten (Master)</h2>
+                <div class="flex justify-start mb-4">
+                    <button id="showAddMasterSubjectBtn" class="px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition">
+                        Neues Master-Fach hinzufügen
+                    </button>
+                </div>
+                <div id="addMasterSubjectForm" class="hidden mt-4 p-3 bg-slate-50 rounded-lg transition-all max-w-sm">
+                    <input type="text" id="newMasterSubjectName" placeholder="Name des Fachs..." class="w-full px-2 py-1.5 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                    <div class="flex gap-2 mt-2">
+                        <button id="addMasterSubjectSubmitBtn" class="flex-1 px-3 py-1.5 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 transition-colors">Hinzufügen</button>
+                        <button id="cancelAddMasterSubjectBtn" class="flex-1 px-3 py-1.5 bg-slate-200 text-slate-700 text-sm rounded-md hover:bg-slate-300 transition-colors">Abbrechen</button>
+                    </div>
+                </div>
+
+                <div id="masterSubjectsList" class="space-y-2 mt-4">
+                    <!-- Master subjects will be listed here -->
+                </div>
+                ${appState.masterSubjects.length === 0 ? '<p class="text-slate-500 text-center py-4">Noch keine Fächer erfasst.</p>' : ''}
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+                <h2 class="text-2xl font-bold mb-4 text-slate-800">Bestehende Master-Lernziele</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200">
+                        <thead class="bg-slate-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Lernziel</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fach</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kategorie</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Gewichtung</th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">Actions</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="masterGoalsTableBody" class="bg-white divide-y divide-slate-200">
+                            <!-- Master goals will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+                ${appState.masterGoals.length === 0 ? '<p class="text-slate-500 text-center py-4">Noch keine Master-Lernziele erfasst.</p>' : ''}
+            </div>
+        `;
+
+        const masterGoalForm = document.getElementById('masterGoalForm');
+        const masterGoalSubjectSelect = masterGoalForm.querySelector('select[name="subjectName"]');
+        const masterGoalWeightInput = masterGoalForm.querySelector('input[name="weight"]');
+        const masterGoalWeightValueSpan = document.getElementById('masterGoalWeightValue');
+
+        // Populate subject dropdown for master goal form
+        masterGoalSubjectSelect.innerHTML = '';
+        appState.masterSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            masterGoalSubjectSelect.appendChild(option);
+        });
+        if (appState.masterSubjects.length === 0) {
+            masterGoalSubjectSelect.innerHTML = '<option value="" disabled selected>Zuerst Fach hinzufügen</option>';
+            masterGoalSubjectSelect.disabled = true;
+            masterGoalForm.querySelector('button[type="submit"]').disabled = true;
+        } else {
+            masterGoalSubjectSelect.disabled = false;
+            masterGoalForm.querySelector('button[type="submit"]').disabled = false;
+        }
+        masterGoalWeightInput.oninput = (e) => {
+            masterGoalWeightValueSpan.textContent = e.target.value;
+        };
+
+        masterGoalForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newMasterGoal = {
+                text: formData.get('text').trim(),
+                subjectName: formData.get('subjectName'), // Now comes from select
+                category: formData.get('category'),
+                weight: parseInt(formData.get('weight'), 10)
+            };
+            if (newMasterGoal.text && newMasterGoal.subjectName) {
+                await addMasterGoal(newMasterGoal);
+                e.target.reset(); // Clear form
+                masterGoalWeightValueSpan.textContent = '3'; // Reset weight display
+                masterGoalSubjectSelect.value = ''; // Reset subject select
+            }
+        });
+
+        // Add/remove master subjects directly
+        const showAddMasterSubjectBtn = document.getElementById('showAddMasterSubjectBtn');
+        const addMasterSubjectForm = document.getElementById('addMasterSubjectForm');
+        const newMasterSubjectNameInput = document.getElementById('newMasterSubjectName');
+        const addMasterSubjectSubmitBtn = document.getElementById('addMasterSubjectSubmitBtn');
+        const cancelAddMasterSubjectBtn = document.getElementById('cancelAddMasterSubjectBtn');
+        const masterSubjectsList = document.getElementById('masterSubjectsList');
+
+        showAddMasterSubjectBtn.addEventListener('click', () => {
+            addMasterSubjectForm.classList.remove('hidden');
+            newMasterSubjectNameInput.focus();
+        });
+        cancelAddMasterSubjectBtn.addEventListener('click', () => {
+            addMasterSubjectForm.classList.add('hidden');
+            newMasterSubjectNameInput.value = '';
+        });
+        addMasterSubjectSubmitBtn.addEventListener('click', async () => {
+            const name = newMasterSubjectNameInput.value.trim();
+            if (name) { // Do not check against appState.masterSubjects, as that comes from RTDB. Let addMasterSubject handle duplicates.
+                await addMasterSubject(name);
+                newMasterSubjectNameInput.value = '';
+                addMasterSubjectForm.classList.add('hidden');
+            }
+        });
+        newMasterSubjectNameInput.addEventListener('keypress', async (e) => {
+            if (e.key === 'Enter') {
+                const name = newMasterSubjectNameInput.value.trim();
+                if (name) { // Do not check against appState.masterSubjects, as that comes from RTDB. Let addMasterSubject handle duplicates.
+                    await addMasterSubject(name);
+                    newMasterSubjectNameInput.value = '';
+                    addMasterSubjectForm.classList.add('hidden');
+                }
+            }
+        });
+
+        // Render list of master subjects
+        masterSubjectsList.innerHTML = '';
+        appState.masterSubjects.forEach(subjectName => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between p-2 bg-slate-50 rounded-md border border-slate-200';
+            div.innerHTML = `
+                <span>${subjectName}</span>
+                <button data-subject="${subjectName}" class="delete-master-subject-btn text-red-600 hover:text-red-800" title="Fach löschen">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            `;
+            masterSubjectsList.appendChild(div);
+            div.querySelector('.delete-master-subject-btn').addEventListener('click', async (e) => {
+                await removeMasterSubject(e.currentTarget.dataset.subject);
+            });
+        });
+
+        const masterGoalsTableBody = document.getElementById('masterGoalsTableBody');
+        masterGoalsTableBody.innerHTML = ''; // Clear previous content
+        appState.masterGoals.forEach(mGoal => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${mGoal.text}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${mGoal.subjectName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${mGoal.category === 'grund' ? 'Grundanforderung' : 'Erweiterte Anforderung'}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${mGoal.weight}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button data-id="${mGoal.id}" class="edit-master-goal-btn text-indigo-600 hover:text-indigo-900 mr-4" title="Bearbeiten">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
+                    <button data-id="${mGoal.id}" class="delete-master-goal-btn text-red-600 hover:text-red-900" title="Löschen">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="18" y1="9" x2="12" y2="15"></line><line x1="12" y1="9" x2="18" y2="15"></line></svg>
+                    </button>
+                </td>
+            `;
+            masterGoalsTableBody.appendChild(row);
+
+            row.querySelector('.edit-master-goal-btn').addEventListener('click', (e) => {
+                showEditMasterGoalModal(e.currentTarget.dataset.id);
+            });
+            row.querySelector('.delete-master-goal-btn').addEventListener('click', async (e) => {
+                await removeMasterGoal(e.currentTarget.dataset.id);
+            });
+        });
+    }
+
+    // Renders the subject-specific page for the active student
+    function renderSubjectPage() {
+        if (!appState.activeStudent || !appState.activeSubject) {
+            mainContent.innerHTML = `<p class="text-slate-500 text-center py-4">Ansicht nicht verfügbar.</p>`;
+            return;
+        }
+
+        const student = appState.students[appState.activeStudent];
+        // Ensure that if student.subjects[appState.activeSubject] is null/undefined, it defaults to an empty object
+        const goals = student.subjects?.[appState.activeSubject] ? Object.values(student.subjects[appState.activeSubject]) : [];
+
+
+        mainContent.innerHTML = `
+            <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
+                <!-- Left Column (Goal List) -->
+                <div class="xl:col-span-2 space-y-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h2 class="text-2xl font-bold mb-4 text-slate-800">Lernziele-Liste für ${student.name} in ${appState.activeSubject}</h2>
+                        <div id="goalList" class="space-y-3 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                            <!-- Goal items will be injected here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column (Charts) -->
+                <div id="chartsContainer" class="xl:col-span-3 space-y-8">
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="text-xl font-bold mb-4 text-center text-slate-800">Lernstand Übersicht nach Gewichtung</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-lg font-semibold mb-2 text-center text-slate-700">Grundanforderungen</h4>
+                                <div class="h-48 mx-auto">
+                                    <canvas id="pieChartGrundInitial"></canvas>
+                                </div>
+                            </div>
+                            <div>
+                                <h5 class="text-md font-medium text-center text-slate-600">Nach Korrektur</h5>
+                                <div class="h-48 mx-auto">
+                                    <canvas id="pieChartGrundCorrected"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-xl font-bold mb-4 text-center text-slate-800">Entwicklung Grundanforderungen (Vor Korrektur)</h3>
+                                <canvas id="timelineGrund"></canvas>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold mb-4 text-center text-slate-800">Entwicklung Erweiterte Anforderungen (Vor Korrektur)</h3>
+                                <canvas id="timelineErweitert"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h3 class="text-xl font-bold mb-4 text-center text-slate-800">Bubble-Übersicht</h3>
+                        <div class="h-80 mx-auto">
+                           <canvas id="bubbleChart"></canvas>
+                        </div>
+                    </div>
+                    <button id="exportPdfBtn" class="w-full bg-blue-600 text-white font-bold py-2.5 px-4 rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 mt-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="10" y2="9"></line></svg>
+                        <span>Als PDF exportieren</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        renderGoalList();
+        renderCharts();
+
+        // Attach event listener for the new export button
+        const exportPdfBtn = document.getElementById('exportPdfBtn');
+        if (exportPdfBtn) {
+            exportPdfBtn.addEventListener('click', exportSubjectOverviewAsPdf);
+        }
+    }
+    
+    // Renders the list of learning goals for the active student's active subject
+    function renderGoalList() {
+        const goalListContainer = document.getElementById('goalList');
+        if (!goalListContainer) return;
+
+        const goalsData = appState.activeStudent && appState.activeSubject
+            ? appState.students[appState.activeStudent]?.subjects?.[appState.activeSubject] || {}
+            : {};
+        
+        // Convert the goals object into an array for sorting and iteration
+        const goals = Object.values(goalsData);
+
+
+        goalListContainer.innerHTML = '';
+        if (goals.length === 0) {
+            goalListContainer.innerHTML = `<p class="text-slate-500 text-center py-4">Noch keine Lernziele für dieses Fach erfasst.</p>`;
+            return;
+        }
+
+        // Sort goals by date (of the latest revision) in descending order, or by ID if no revisions
+        goals.slice().sort((a, b) => {
+            const dateA = a.revisions?.length > 0 ? new Date(a.revisions[a.revisions.length - 1].date) : new Date(0); // Use epoch for no revisions
+            const dateB = b.revisions?.length > 0 ? new Date(b.revisions[b.revisions.length - 1].date) : new Date(0);
+            return dateB - dateA;
+        }).forEach(goal => {
+            const latestRevision = goal.revisions?.length > 0 ? goal.revisions[goal.revisions.length - 1] : {};
+            const statusColor = statusInfo[latestRevision.status]?.color || 'bg-slate-400';
+            const statusLabel = latestRevision.status ? statusInfo[latestRevision.status]?.label : 'Nicht beurteilt';
+            const categoryText = goal.category === 'grund' ? 'Grundanforderung' : 'Erweiterte Anforderung';
+            const formattedDate = latestRevision.date ? new Date(latestRevision.date).toLocaleDateString('de-DE') : 'N/A';
+
+            const el = document.createElement('div');
+            el.className = 'p-3.5 border border-slate-200 rounded-lg bg-slate-50';
+            
+            el.innerHTML = `
+                <div class="flex justify-between items-start gap-3">
+                    <div class="flex-1">
+                        <p class="font-semibold text-slate-800">${goal.text}</p>
+                        <div class="flex items-center gap-4 text-sm text-slate-500 mt-2 flex-wrap">
+                            <span class="flex items-center gap-1.5 whitespace-nowrap"><span class="w-3 h-3 rounded-full ${statusColor}"></span>${statusLabel}</span>
+                            <span>${categoryText}</span>
+                            <span>Gewicht: ${goal.weight}</span>
+                            <span>${formattedDate}</span>
+                        </div>
+                        <!-- Visualisierung der Revisionshistorie -->
+                        <div class="flex items-center gap-1.5 mt-2">
+                            <span class="text-xs text-slate-500">Historie:</span>
+                            ${(goal.revisions || []).map(rev => `<span class="w-2.5 h-2.5 rounded-full ${statusInfo[rev.status]?.color}" title="${statusInfo[rev.status]?.label} am ${new Date(rev.date).toLocaleDateString('de-DE')}"></span>`).join('')}
+                            ${(goal.revisions || []).length === 0 ? '<span class="text-xs text-slate-400">Keine Beurteilungen</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button class="update-goal-btn flex-shrink-0 text-slate-400 hover:text-indigo-600 transition-colors" title="Status aktualisieren" data-goal-id="${goal.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            el.querySelector('.update-goal-btn').addEventListener('click', (e) => showUpdateStatusModal(e.currentTarget.dataset.goalId));
+            goalListContainer.appendChild(el);
+        });
+    }
+
+    // Renders all Chart.js graphs for the active student's active subject
+    function renderCharts() {
+        if (!appState.activeStudent || !appState.students[appState.activeStudent] || !appState.activeSubject) {
+            // No student or subject selected, or data is missing, so destroy charts
+            for (const chartKey in charts) {
+                if (charts[chartKey]) {
+                    charts[chartKey].destroy();
+                    charts[chartKey] = null;
+                }
+            }
+            return;
+        }
+
+        const goalsData = appState.students[appState.activeStudent]?.subjects?.[appState.activeSubject] || {};
+        const goals = Object.values(goalsData); // Convert object of goals to array
+        
+        const months = ['Aug', 'Sep', 'Okt', 'Nov', 'Dez', 'Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul'];
+
+        // Destroy existing charts to prevent memory leaks and rendering issues
+        for (const chartKey in charts) {
+            if (charts[chartKey]) {
+                charts[chartKey].destroy();
+                charts[chartKey] = null;
+            }
+        }
+
+        // --- Pie Charts (now four: Grund-Initial, Grund-Corrected, Erweitert-Initial, Erweitert-Corrected) ---
+        const pieChartConfigs = [
+            { id: 'pieChartGrundInitial', type: 'grund', revisionSource: 'initial', chartKey: 'weightedPieChartGrundInitial', opacityKey: 'pieColorOpaque' },
+            { id: 'pieChartGrundCorrected', type: 'grund', revisionSource: 'latest', chartKey: 'weightedPieChartGrundCorrected', opacityKey: 'pieColorTransparent' },
+            { id: 'pieChartErweitertInitial', type: 'erweitert', revisionSource: 'initial', chartKey: 'weightedPieChartErweitertInitial', opacityKey: 'pieColorOpaque' },
+            { id: 'pieChartErweitertCorrected', type: 'erweitert', revisionSource: 'latest', chartKey: 'weightedPieChartErweitertCorrected', opacityKey: 'pieColorTransparent' },
+        ];
+
+        pieChartConfigs.forEach(config => {
+            const ctx = document.getElementById(config.id)?.getContext('2d');
+            if (!ctx) return;
+
+            const filteredGoals = goals.filter(g => g.category === config.type);
+            const statusWeightedSums = { erreicht: 0, teilweise: 0, nicht: 0 };
+
+            filteredGoals.forEach(goal => {
+                let relevantRevision;
+                if (config.revisionSource === 'initial') {
+                    relevantRevision = goal.revisions?.length > 0 ? goal.revisions[0] : null;
+                } else if (config.revisionSource === 'latest') {
+                    if (goal.revisions?.length > 1) {
+                         relevantRevision = goal.revisions[goal.revisions.length - 1];
+                    } else {
+                        return; // Skip this goal if it's for 'latest' but only has initial revision
+                    }
+                } else {
+                    return;
+                }
+
+                if (relevantRevision && statusWeightedSums[relevantRevision.status] !== undefined) {
+                    statusWeightedSums[relevantRevision.status] += goal.weight;
+                }
+            });
+
+            const pieData = {
+                labels: Object.values(statusInfo).map(s => s.label),
+                datasets: [{
+                    data: Object.keys(statusInfo).map(status => statusWeightedSums[status]),
+                    backgroundColor: Object.values(statusInfo).map(s => s[config.opacityKey]),
+                    hoverOffset: 4
+                }]
+            };
+
+            const pieConfig = {
+                type: 'pie',
+                data: pieData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((acc, current) => acc + current, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(2) : 0;
+                                    return `${label}: ${value.toFixed(1)} gew. Pkt. (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            charts[config.chartKey] = new Chart(ctx, pieConfig);
+        });
+
+        // --- Timeline charts with percentages ---
+        ['grund', 'erweitert'].forEach(type => {
+            const canvasId = type === 'grund' ? 'timelineGrund' : 'timelineErweitert';
+            const chartInstanceKey = type === 'grund' ? 'timelineGrund' : 'timelineErweitert';
+            const ctx = document.getElementById(canvasId)?.getContext('2d');
+            if (!ctx) return;
+
+            const monthlyWeightedSums = Array(12).fill(0).map(() => ({ erreicht: 0, teilweise: 0, nicht: 0 }));
+            
+            goals.filter(g => g.category === type).forEach(goal => {
+                if (goal.revisions?.length > 0) {
+                    const initialRevision = goal.revisions[0];
+                    const monthIndex = new Date(initialRevision.date).getMonth();
+                    const schoolYearMonthIndex = (monthIndex - 7 + 12) % 12; // Aug is 0, Sep 1, ..., Jul 11
+                    
+                    if(monthlyWeightedSums[schoolYearMonthIndex]) { 
+                        monthlyWeightedSums[schoolYearMonthIndex][initialRevision.status] += goal.weight;
+                    }
+                }
+            });
+            
+            const monthlyPercentages = monthlyWeightedSums.map(monthData => {
+                const totalWeight = monthData.erreicht + monthData.teilweise + monthData.nicht;
+                if (totalWeight === 0) {
+                    return { erreicht: 0, teilweise: 0, nicht: 0 };
+                }
+                return {
+                    erreicht: (monthData.erreicht / totalWeight) * 100,
+                    teilweise: (monthData.teilweise / totalWeight) * 100,
+                    nicht: (monthData.nicht / totalWeight) * 100
+                };
+            });
+
+            const datasets = Object.keys(statusInfo).map(status => ({
+                label: statusInfo[status].label,
+                data: monthlyPercentages.map(m => m[status]),
+                fill: true,
+                backgroundColor: statusInfo[status].chartBg,
+                borderColor: statusInfo[status].chartBorder,
+                borderWidth: 2,
+                tension: 0.3,
+            }));
+
+            const config = {
+                type: 'line',
+                data: { labels: months, datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: true,
+                    scales: { 
+                        x: { stacked: true }, 
+                        y: { 
+                            stacked: true, 
+                            min: 0, max: 100,
+                            title: { display: true, text: 'Prozentualer Anteil (gewichtet)' },
+                            ticks: { callback: value => value + '%' }
+                        } 
+                    },
+                    plugins: { 
+                        legend: { position: 'bottom' }, 
+                        tooltip: { 
+                            callbacks: { 
+                                label: context => `${context.dataset.label}: ${context.parsed.y.toFixed(2)}%`
+                            } 
+                        } 
+                    },
+                    interaction: { mode: 'index', intersect: false },
+                }
+            };
+            charts[chartInstanceKey] = new Chart(ctx, config);
+        });
+
+        // --- Bubble chart ---
+        const ctxB = document.getElementById('bubbleChart')?.getContext('2d');
+        if (!ctxB) return;
+        
+        const aggregatedBubbleDataForVisuals = {
+            'grund_initial': { 'erreicht': {weight: 0, count: 0}, 'teilweise': {weight: 0, count: 0}, 'nicht': {weight: 0, count: 0} },
+            'grund_corrected': { 'erreicht': {weight: 0, count: 0}, 'teilweise': {weight: 0, count: 0}, 'nicht': {weight: 0, count: 0} },
+            'erweitert_initial': { 'erreicht': {weight: 0, count: 0}, 'teilweise': {weight: 0, count: 0}, 'nicht': {weight: 0, count: 0} },
+            'erweitert_corrected': { 'erreicht': {weight: 0, count: 0}, 'teilweise': {weight: 0, count: 0}, 'nicht': {weight: 0, count: 0} }
+        };
+
+        goals.forEach(goal => {
+            const initialRevision = goal.revisions?.length > 0 ? goal.revisions[0] : null;
+            const latestRevision = goal.revisions?.length > 0 ? goal.revisions[goal.revisions.length - 1] : null;
+            const isCorrected = goal.revisions?.length > 1;
+
+            if (initialRevision) {
+                const initialBucketKey = `${goal.category}_initial`;
+                aggregatedBubbleDataForVisuals[initialBucketKey][initialRevision.status].weight += goal.weight;
+                aggregatedBubbleDataForVisuals[initialBucketKey][initialRevision.status].count += 1;
+            }
+
+            if (isCorrected && latestRevision) {
+                const correctedBucketKey = `${goal.category}_corrected`;
+                aggregatedBubbleDataForVisuals[correctedBucketKey][latestRevision.status].weight += goal.weight;
+                aggregatedBubbleDataForVisuals[correctedBucketKey][latestRevision.status].count += 1;
+            }
+        });
+
+        const bubbleChartDatasets = [];
+        const xPositions = { 'grund_initial': 0, 'grund_corrected': 1, 'erweitert_initial': 2, 'erweitert_corrected': 3 };
+        const yPositions = { 'nicht': 0, 'teilweise': 1, 'erreicht': 2 };
+        const jitterAmount = 0.2;
+
+        function createBubbleDataset(categoryType, pointStyle, opacityKey, legendLabelBase) {
+            const dataPoints = [];
+            const backgroundColors = [];
+            const borderColors = [];
+
+            Object.keys(aggregatedBubbleDataForVisuals[categoryType]).forEach(status => {
+                const sumWeight = aggregatedBubbleDataForVisuals[categoryType][status].weight;
+                const count = aggregatedBubbleDataForVisuals[categoryType][status].count;
+                if (sumWeight > 0) {
+                    dataPoints.push({
+                        x: xPositions[categoryType] + (Math.random() - 0.5) * jitterAmount,
+                        y: yPositions[status] + (Math.random() - 0.5) * jitterAmount,
+                        r: Math.sqrt(sumWeight) * 8 + 4,
+                        label: `${legendLabelBase.trim()} - ${statusInfo[status].label}: ${sumWeight.toFixed(1)} gew. Pkt. (${count} Ziele)`
+                    });
+                    backgroundColors.push(statusInfo[status][opacityKey]);
+                    borderColors.push(statusInfo[status].bubbleBorderColor);
+                }
+            });
+
+            if (dataPoints.length > 0) {
+                bubbleChartDatasets.push({
+                    label: legendLabelBase,
+                    pointStyle: pointStyle,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 0,
+                    data: dataPoints
+                });
+            }
+        }
+
+        createBubbleDataset('grund_initial', 'circle', 'chartBgOpaque', 'GA vor Korr.');
+        createBubbleDataset('grund_corrected', 'circle', 'chartBgTransparent', 'GA nach Korr.');
+        createBubbleDataset('erweitert_initial', 'rect', 'chartBgOpaque', 'EA vor Korr.');
+        createBubbleDataset('erweitert_corrected', 'rect', 'chartBgTransparent', 'EA nach Korr.');
+
+
+        const configB = {
+            type: 'bubble',
+            data: { datasets: bubbleChartDatasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        min: -0.5,
+                        max: 3.5,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                if (value === 0) return 'GA vor Korr.';
+                                if (value === 1) return 'GA nach Korr.';
+                                if (value === 2) return 'EA vor Korr.';
+                                if (value === 3) return 'EA nach Korr.';
+                                return '';
+                            },
+                            display: true,
+                            stepSize: 1
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        min: -0.5,
+                        max: 2.5,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                if (value === 0) return 'Nicht erreicht';
+                                if (value === 1) return 'Teilweise';
+                                if (value === 2) return 'Erreicht';
+                                return '';
+                            },
+                            display: true,
+                            stepSize: 1
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.datasets.length) {
+                                    return data.datasets.map((dataset, i) => {
+                                        return {
+                                            text: dataset.label,
+                                            fillStyle: dataset.backgroundColor[0],
+                                            strokeStyle: dataset.borderColor[0],
+                                            pointStyle: dataset.pointStyle,
+                                            hidden: !chart.isDatasetVisible(i),
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw.label;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        charts.bubbleChart = new Chart(ctxB, configB);
+    }
+    
+    // Renders the overview page displaying a summary of the active student's progress
+    function renderOverviewPage() {
+        if (!appState.activeStudent) {
+            mainContent.innerHTML = `
+                <div class="p-8 bg-white rounded-xl shadow-sm text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-800">Bitte einen Schüler auswählen</h2>
+                    <p class="text-slate-600">Wählen Sie links einen Schüler aus oder fügen Sie einen neuen hinzu, um sein Portfolio anzuzeigen.</p>
+                </div>
+            `;
+            return;
+        }
+
+        const student = appState.students[appState.activeStudent];
+        const subjects = student.subjects;
+
+        mainContent.innerHTML = `
+            <div class="p-8 bg-white rounded-xl shadow-sm">
+                <h2 class="text-3xl font-bold mb-6 text-slate-800">Übersicht Lernstand für ${student.name}</h2>
+                <div id="subjectOverviewGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Subject overview cards will be injected here -->
+                </div>
+                <!-- The "add subject to student" button is removed as subjects are managed globally now -->
+            </div>
+        `;
+
+        const overviewGrid = document.getElementById('subjectOverviewGrid');
+        if (!overviewGrid) return;
+
+        if (!subjects || Object.keys(subjects).length === 0) {
+            overviewGrid.innerHTML = `<p class="text-slate-500 text-center col-span-full py-10">Noch keine Fächer für ${student.name} erfasst.</p>`;
+        }
+
+        Object.keys(subjects || {}).forEach(subjectName => {
+            const goals = Object.values(subjects[subjectName] || {});
+
+            const grundGoals = goals.filter(g => g.category === 'grund');
+            const totalWeightedGrund = grundGoals.reduce((sum, g) => sum + g.weight, 0);
+            const achievedWeightedGrund = grundGoals.filter(g => g.revisions?.length > 0 && g.revisions[g.revisions.length - 1].status === 'erreicht').reduce((sum, g) => sum + g.weight, 0);
+            const percentageGrund = totalWeightedGrund > 0 ? ((achievedWeightedGrund / totalWeightedGrund) * 100).toFixed(0) : 0;
+
+            const erweitertGoals = goals.filter(g => g.category === 'erweitert');
+            const totalWeightedErweitert = erweitertGoals.reduce((sum, g) => sum + g.weight, 0);
+            const achievedWeightedErweitert = erweitertGoals.filter(g => g.revisions?.length > 0 && g.revisions[g.revisions.length - 1].status === 'erreicht').reduce((sum, g) => sum + g.weight, 0);
+            const percentageErweitert = totalWeightedErweitert > 0 ? ((achievedWeightedErweitert / totalWeightedErweitert) * 100).toFixed(0) : 0;
+            
+            const progressColorGrund = percentageGrund >= 75 ? 'bg-emerald-500' : (percentageGrund >= 40 ? 'bg-amber-500' : 'bg-red-500');
+            const progressColorErweitert = percentageErweitert >= 75 ? 'bg-emerald-500' : (percentageErweitert >= 40 ? 'bg-amber-500' : 'bg-red-500');
+
+            const card = document.createElement('div');
+            card.className = `bg-slate-50 p-6 rounded-lg shadow-sm border border-slate-200 cursor-pointer hover:shadow-md transition-shadow`;
+            card.onclick = () => {
+                appState.activeSubject = subjectName;
+                appState.viewMode = 'studentSubject';
+                render();
+            };
+            card.innerHTML = `
+                <h3 class="text-xl font-bold text-slate-800 mb-3">${subjectName}</h3>
+                
+                <div class="mb-3">
+                    <p class="text-sm text-slate-600 mb-1">Grundanforderungen:</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full ${progressColorGrund}" style="width: ${percentageGrund}%"></div>
+                        </div>
+                        <span class="text-slate-600 font-semibold text-sm">${percentageGrund}%</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">${achievedWeightedGrund.toFixed(1)} von ${totalWeightedGrund.toFixed(1)} gewichteten Punkten</p>
+                </div>
+
+                <div>
+                    <p class="text-sm text-slate-600 mb-1">Erweiterte Anforderungen:</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div class="h-2.5 rounded-full ${progressColorErweitert}" style="width: ${percentageErweitert}%"></div>
+                        </div>
+                        <span class="text-slate-600 font-semibold text-sm">${percentageErweitert}%</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-1">${achievedWeightedErweitert.toFixed(1)} von ${totalWeightedErweitert.toFixed(1)} gewichteten Punkten</p>
+                </div>
+            `;
+            overviewGrid.appendChild(card);
+        });
+    }
+
+    // Function to export the charts container as PDF
+    function exportSubjectOverviewAsPdf() {
+        if (!appState.activeStudent || !appState.activeSubject) {
+            const message = document.createElement('div');
+            message.className = 'fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-[100]';
+            message.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                    <p class="mt-4 text-slate-700">Bitte wählen Sie zuerst einen Schüler und ein Fach aus.</p>
+                    <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" onclick="this.parentNode.parentNode.remove()">OK</button>
+                </div>
+            `;
+            document.body.appendChild(message);
+            return;
+        }
+
+        const student = appState.students[appState.activeStudent];
+        const studentName = student.name;
+        const subjectName = appState.activeSubject;
+
+        const chartsContainer = document.getElementById('chartsContainer');
+        if (!chartsContainer) {
+            const message = document.createElement('div');
+            message.className = 'fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-[100]';
+            message.innerHTML = `
+                <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                    <p class="mt-4 text-slate-700">Charts-Container nicht gefunden.</p>
+                    <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" onclick="this.parentNode.parentNode.remove()">OK</button>
+                </div>
+            `;
+            document.body.appendChild(message);
+            return;
+        }
+
+        // Show a temporary loading indicator
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-[100]';
+        loadingOverlay.innerHTML = `
+            <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-indigo-500 border-t-transparent"></div>
+                <p class="mt-4 text-slate-700">PDF wird generiert...</p>
+            </div>
+        `;
+        document.body.appendChild(loadingOverlay);
+
+        // Temporarily hide scrollbars if they interfere with rendering
+        const originalOverflowY = document.body.style.overflowY;
+        document.body.style.overflowY = 'hidden';
+
+        // Use a timeout to ensure the loading indicator is rendered
+        setTimeout(() => {
+            html2canvas(chartsContainer, {
+                scale: 2, // Increase scale for better resolution
+                useCORS: true, // Important if images are from external sources, though not strictly needed here
+                logging: false, // Disable logging for cleaner console
+                scrollX: 0, // Prevent horizontal scrolling issues
+                scrollY: -window.scrollY, // Correct vertical position if scrolled
+                windowWidth: chartsContainer.scrollWidth,
+                windowHeight: chartsContainer.scrollHeight + 50 // Add some buffer for content that might be slightly out of bounds
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf; // Access jspdf from window object
+                const pdf = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
+                
+                const imgWidthOriginal = canvas.width;
+                const imgHeightOriginal = canvas.height;
+
+                const pdfPageWidth = pdf.internal.pageSize.getWidth();
+                const pdfPageHeight = pdf.internal.pageSize.getHeight();
+
+                // Calculate aspect ratio
+                const aspectRatio = imgWidthOriginal / imgHeightOriginal;
+
+                let imgWidthPdf = pdfPageWidth - 20; // Leave 10mm margin on each side (20mm total)
+                let imgHeightPdf = imgWidthPdf / aspectRatio;
+
+                // If calculated height exceeds page height, scale down further based on height
+                if (imgHeightPdf > pdfPageHeight - 20) { // Leave 10mm margin at top/bottom (20mm total)
+                    imgHeightPdf = pdfPageHeight - 20;
+                    imgWidthPdf = imgHeightPdf * aspectRatio;
+                }
+
+                // Center the image on the page
+                const xPos = (pdfPageWidth - imgWidthPdf) / 2;
+                const yPos = (pdfPageHeight - imgHeightPdf) / 2;
+
+                pdf.addImage(imgData, 'PNG', xPos, yPos, imgWidthPdf, imgHeightPdf);
+                
+                pdf.save(`Lernstand_${studentName.replace(/\s+/g, '_')}_${subjectName.replace(/\s+/g, '_')}.pdf`);
+
+            }).catch(error => {
+                console.error("Error generating PDF:", error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'fixed inset-0 bg-slate-900 bg-opacity-75 flex items-center justify-center z-[100]';
+                errorMessage.innerHTML = `
+                    <div class="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
+                        <p class="mt-4 text-slate-700">Fehler beim Generieren des PDFs. Bitte versuchen Sie es erneut.</p>
+                        <button class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" onclick="this.parentNode.parentNode.remove()">OK</button>
+                    </div>
+                `;
+                document.body.appendChild(errorMessage);
+            }).finally(() => {
+                // Remove loading indicator and restore original scrollbar
+                loadingOverlay.remove();
+                document.body.style.overflowY = originalOverflowY;
+            });
+        }, 50); // Small timeout to allow loading indicator to show
+    }
+
+
+    // --- MASTER RENDER & EVENT LISTENERS ---
+    // Main render function that orchestrates UI updates
+    function render() {
+        renderSidebar();
+        renderMainContent();
+    }
+
+    // Event listeners for student management
+    showAddStudentBtn.addEventListener('click', () => {
+        addStudentForm.classList.remove('hidden');
+        newStudentNameInput.focus();
+    });
+    cancelAddStudentBtn.addEventListener('click', () => {
+        addStudentForm.classList.add('hidden');
+        newStudentNameInput.value = '';
+    });
+    addStudentBtn.addEventListener('click', addStudent);
+    newStudentNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addStudent();
+    });
+
+    // Event listener for the "Übersicht" button
+    showOverviewBtn.addEventListener('click', () => {
+        appState.activeSubject = null; // Set active subject to null to show overview for current student
+        appState.viewMode = 'studentOverview';
+        render();
+    });
+
+    // Event listener for "Master-Lernziele" button
+    showMasterGoalsBtn.addEventListener('click', () => {
+        appState.viewMode = 'masterGoals';
+        appState.activeSubject = null; // Clear active subject in master view
+        render();
+    });
+
+    // --- INITIALIZATION ---
+    // Start Firebase initialization when the DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        initializeFirebase();
+    });
+</script>
+
+</body>
+</html>
